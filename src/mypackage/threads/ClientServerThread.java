@@ -24,8 +24,18 @@ public class ClientServerThread extends Thread{
         try {
             PrintWriter pw = new PrintWriter(serverSocket.getOutputStream(), true);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-            System.out.println(bufferedReader.readLine());
-            pw.println("Connected: " + serverSocket.getPort());
+            String firstLine = bufferedReader.readLine();
+            if(firstLine.equals("Connect node")){
+                node.getConnectedNodes().add(Integer.parseInt(bufferedReader.readLine()));
+                System.out.println("Connected nodes");
+                for(int port : node.getConnectedNodes()){
+                    System.out.println(port);
+                }
+            }
+            else if(firstLine.equals("Serve client")){
+                pw.println("Connected: " + serverSocket.getPort());
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
