@@ -27,7 +27,7 @@ public class DatabaseClient {
                 Socket socket = new Socket(nodeIP, nodePort);
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                printWriter.println("Client: " + socket.getLocalPort()+ ":"+socket.getLocalAddress().getHostAddress());
+                printWriter.println("Serve client");
                 System.out.println(bufferedReader.readLine());
                 socket.close();
 

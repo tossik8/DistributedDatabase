@@ -33,11 +33,33 @@ public class ClientServerThread extends Thread{
                 }
             }
             else if(firstLine.equals("Serve client")){
-                pw.println("Connected: " + serverSocket.getPort());
+                pw.println("Connected: " + serverSocket.getLocalPort());
             }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+    public int getValue(){
+        return Integer.MIN_VALUE;
+    }
+    public boolean setValue(int key, int value){
+        return false;
+    }
+
+    public String findKey(int key){
+        return "";
+    }
+    public int getMax(){
+        return 0;
+    }
+    public int getMin(){
+        return 0;
+    }
+    public void newPair(int key, int value){
+
+    }
+    public void terminate(){
+
+    }
+
 }
