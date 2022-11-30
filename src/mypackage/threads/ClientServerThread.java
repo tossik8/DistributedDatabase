@@ -2,11 +2,9 @@ package mypackage.threads;
 
 import mypackage.DatabaseNode;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ClientServerThread extends Thread{
     private final Socket serverSocket;
@@ -25,21 +23,36 @@ public class ClientServerThread extends Thread{
             PrintWriter pw = new PrintWriter(serverSocket.getOutputStream(), true);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
             String firstLine = bufferedReader.readLine();
+            System.out.println(firstLine);
             if(firstLine.equals("Connect node")){
                 node.getConnectedNodes().add(Integer.parseInt(bufferedReader.readLine()));
-                System.out.println("Connected nodes");
-                for(int port : node.getConnectedNodes()){
-                    System.out.println(port);
-                }
+//                System.out.println("Connected nodes");
+//                for(int port : node.getConnectedNodes()){
+//                    System.out.println(port);
+//                }
             }
             else if(firstLine.equals("Serve client")){
                 pw.println("Connected: " + serverSocket.getLocalPort());
+                node.iterateOverNetwork(new ArrayList<>());
+            }
+            else if(firstLine.equals("Serve node")){
+                pw.println(node.getPort() + " - " + node.getKey() + ":"+node.getValue());
+
+
+            }
+            else if(firstLine.equals("Provide node")){
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(serverSocket.getOutputStream());
+                objectOutputStream.writeObject(node);
+                objectOutputStream.flush();
+                objectOutputStream.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
     public int getValue(){
+
         return Integer.MIN_VALUE;
     }
     public boolean setValue(int key, int value){
@@ -62,4 +75,7 @@ public class ClientServerThread extends Thread{
 
     }
 
+    public DatabaseNode getNode() {
+        return node;
+    }
 }

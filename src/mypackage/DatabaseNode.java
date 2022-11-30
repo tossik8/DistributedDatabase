@@ -2,16 +2,13 @@ package mypackage;
 
 import mypackage.threads.ClientServerThread;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.BindException;
-import java.net.ConnectException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import javax.xml.crypto.Data;
+import java.io.*;
+import java.net.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DatabaseNode {
+public class DatabaseNode implements Serializable {
     public static void main(String[] args) {
         if(args.length < 3 || ((!args[0].equals("-tcpport") || !args[2].equals("-record")))){
             System.out.println("Wrong argument names\nExample of execution: java mypackage.DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989");
@@ -48,9 +45,11 @@ public class DatabaseNode {
     private int key;
     private int value;
 
+    private static final long serialVersionUID = 6529685098267757690L; //ensures serialization and deserialization
     private List<Integer> connectedNodes;
 
-    private ServerSocket serverSocket;
+
+    private transient ServerSocket serverSocket; //transient for not serializing the server
 
     public DatabaseNode(int port, String ip, int key, int value, List<Integer> addresses) {
         this.ip = ip;
@@ -133,5 +132,45 @@ public class DatabaseNode {
         return true;
     }
 
+    public void iterateOverNetwork(List<Integer> visitedNodes) {
+        PrintWriter printWriter;
+//        for (int portNode : this.getConnectedNodes()) {
+//            if (!visitedNodes.contains(portNode)) {
+//                try (Socket socket = new Socket("localhost", portNode)) {
+//                    printWriter = new PrintWriter(socket.getOutputStream(), true);
+//                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//                    printWriter.println("Serve node");
+//                    System.out.println(bufferedReader.readLine());
+//                    visitedNodes.add(portNode);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        }
+        for (int portNode : this.connectedNodes) {
+            if(!visitedNodes.contains(portNode)) {
+                try (Socket socket = new Socket("localhost", portNode)) {
+                    {
+                        printWriter = new PrintWriter(socket.getOutputStream(), true);
+                        printWriter.println("Provide node");
+
+                        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+                        DatabaseNode node = (DatabaseNode) objectInputStream.readObject();
+                        objectInputStream.close();
+                        System.out.println("Received object " + node.port);
+                        visitedNodes.add(portNode);
+                        node.iterateOverNetwork(visitedNodes);
+                    }
+
+                } catch (UnknownHostException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
 
 }
