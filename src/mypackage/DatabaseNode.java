@@ -1,11 +1,10 @@
 package mypackage;
 
-import mypackage.threads.ClientServerThread;
-
 import java.io.*;
-import java.net.*;
 import java.util.LinkedList;
 import java.util.List;
+
+import static mypackage.Node.connectNode;
 
 
 public class DatabaseNode implements Serializable {
@@ -20,20 +19,19 @@ public class DatabaseNode implements Serializable {
             int key = Integer.parseInt(arr[0]);
             int value = Integer.parseInt(arr[1]);
             List<String> addresses = new LinkedList<>();
-            DatabaseNode node = new DatabaseNode(port, "192.168.0.94", key, value, addresses);
+            Node node = new Node(port, "192.168.0.94", key, value, addresses);
             for(int i = 5; i < args.length; i+=2){
                 if(args[i-1].equals("-connect")){
                     String[] address = args[i].split(":");
-                    if(connectNode(address[0],Integer.parseInt(address[1]), node.port)){
+                    if(connectNode(address[0],Integer.parseInt(address[1]), node.getPort())){
                         addresses.add(args[i]);
-                        System.out.println(args[i]);
                     }
                 }
                 else{
                     System.out.println("Wrong argument\nExpected -connect. Received " + args[i-1]);
                 }
             }
-            System.out.print("The new node listens on port " + node.port + ", contains the value of " + node.value + " under the key " + node.key+"\nConnected to nodes: ");
+            System.out.print("The new node listens on port " + node.getPort() + ", contains the value of " + node.getValue() + " under the key " + node.getKey()+"\nConnected to nodes: ");
             for(String neighbour:node.getConnectedNodes()){
                 System.out.println(neighbour);
             }
@@ -46,137 +44,8 @@ public class DatabaseNode implements Serializable {
                     java mypackage.DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989""");
         }
     }
-    private int port;
-    private final String ip;
-    private int key;
-    private int value;
-
-    @Serial
-    private static final long serialVersionUID = 6529685098267757690L; //ensures serialization and deserialization
-    private List<String> connectedNodes;
 
 
-    private transient ServerSocket serverSocket; //transient for not serializing the server
 
-    public DatabaseNode(int port, String ip, int key, int value, List<String> addresses) {
-        this.ip = ip;
-        this.key = key;
-        this.value = value;
-        setPort(port);
-        this.connectedNodes = addresses;
-    }
-
-
-    public void listen() {
-        while(true){
-            try {
-                Socket request = serverSocket.accept();
-                (new ClientServerThread(request, this)).start();
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-    public void setValue(int value) {
-        this.value = value;
-    }
-
-    public void setPort(int port) {
-        do{
-            try{
-                serverSocket = new ServerSocket(port);
-                break;
-            } catch (BindException e){
-                ++port;
-            }
-            catch (IOException e) {
-                ++port;
-            }
-        }while(true);
-        this.port = port;
-
-    }
-
-    public void setKey(int key) {
-        this.key = key;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public int getKey() {
-        return key;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public List<String> getConnectedNodes() {
-        return connectedNodes;
-    }
-
-    public static boolean connectNode(String ip,int port, int newPort){
-        try(Socket socket = new Socket(ip, port)) {
-            PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
-            pw.println("Connect node");
-            pw.println(ip+":"+newPort);
-            pw.close();
-        }catch (ConnectException e){
-            return false;
-        }
-        catch (IOException e) {
-            return false;
-        }
-        return true;
-    }
-
-    public void iterateOverNetwork(List<String> visitedNodes) {
-        PrintWriter printWriter;
-//        for (int portNode : this.getConnectedNodes()) {
-//            if (!visitedNodes.contains(portNode)) {
-//                try (Socket socket = new Socket("localhost", portNode)) {
-//                    printWriter = new PrintWriter(socket.getOutputStream(), true);
-//                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//                    printWriter.println("Serve node");
-//                    System.out.println(bufferedReader.readLine());
-//                    visitedNodes.add(portNode);
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        }
-        for (String address : this.connectedNodes) {
-            if(!visitedNodes.contains(address)) {
-                int portNode = Integer.parseInt(address.split(":")[1]);
-                try (Socket socket = new Socket(address.split(":")[0], portNode)) {
-                    {
-                        printWriter = new PrintWriter(socket.getOutputStream(), true);
-                        printWriter.println("Provide node");
-
-                        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-                        DatabaseNode node = (DatabaseNode) objectInputStream.readObject();
-                        objectInputStream.close();
-                        System.out.println("Received object " + node.port);
-                        visitedNodes.add(address);
-                        node.iterateOverNetwork(visitedNodes);
-                    }
-
-                } catch (UnknownHostException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
 
 }

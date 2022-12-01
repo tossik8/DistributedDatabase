@@ -1,6 +1,6 @@
 package mypackage.threads;
 
-import mypackage.DatabaseNode;
+import mypackage.Node;
 
 import java.io.*;
 import java.net.Socket;
@@ -8,10 +8,10 @@ import java.util.ArrayList;
 
 public class ClientServerThread extends Thread{
     private final Socket serverSocket;
-    private final DatabaseNode node;
+    private final Node node;
 
 
-    public ClientServerThread(Socket serverSocket, DatabaseNode node) {
+    public ClientServerThread(Socket serverSocket, Node node) {
         this.serverSocket = serverSocket;
         this.node = node;
     }
