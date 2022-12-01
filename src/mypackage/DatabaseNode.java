@@ -1,7 +1,6 @@
 package mypackage;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class DatabaseNode implements Serializable {
                 return;
             }
             List<String> addresses = new LinkedList<>();
-            Node node = new Node(port, "192.168.0.94", key, value, addresses);
+            Node node = new Node(port, "localhost", key, value, addresses);
             for(int i = 5; i < args.length; i+=2){
                 if(args[i-1].equals("-connect")){
                     String[] address = args[i].split(":");

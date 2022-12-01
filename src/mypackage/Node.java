@@ -4,6 +4,7 @@ import mypackage.threads.ClientServerThread;
 
 import java.io.*;
 import java.net.*;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Node implements Serializable {
@@ -45,10 +46,7 @@ public class Node implements Serializable {
             try{
                 serverSocket = new ServerSocket(port);
                 break;
-            } catch (BindException e){
-                ++port;
-            }
-            catch (IOException e) {
+            } catch (IOException e){
                 ++port;
             }
         }while(true);
@@ -127,14 +125,38 @@ public class Node implements Serializable {
                         node.iterateOverNetwork(visitedNodes);
                     }
 
-                } catch (UnknownHostException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (ClassNotFoundException e) {
+                } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
+    }
+
+    public String getValueRequest(int key, List<String> visitedNodes) {
+        if (this.key == key) {
+            return key + ":" + this.value;
+        }
+        PrintWriter printWriter;
+        visitedNodes.add(this.ip + ":" + this.port);
+        for (String address : this.connectedNodes) {
+            if (!visitedNodes.contains(address)) {
+                int portNode = Integer.parseInt(address.split(":")[1]);
+                try (Socket socket = new Socket(address.split(":")[0], portNode)) {
+                    {
+                        printWriter = new PrintWriter(socket.getOutputStream(), true);
+                        printWriter.println("Provide node");
+
+                        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+                        Node node = (Node) objectInputStream.readObject();
+                        objectInputStream.close();
+                        return node.getValueRequest(key, visitedNodes);
+                    }
+
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return "Error, there is no record with the key of " + key;
     }
 }

@@ -36,6 +36,9 @@ public class DatabaseClient {
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                 printWriter.println("Serve client");
                 System.out.println(bufferedReader.readLine());
+                printWriter.println(operation);
+                printWriter.println(parameters.get(0));
+                System.out.println(bufferedReader.readLine());
                 socket.close();
 
             } catch (ConnectException e){

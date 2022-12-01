@@ -3,8 +3,11 @@ package mypackage.threads;
 import mypackage.Node;
 
 import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ClientServerThread extends Thread{
     private final Socket serverSocket;
@@ -34,7 +37,10 @@ public class ClientServerThread extends Thread{
             }
             else if(firstLine.equals("Serve client")){
                     pw.println("Connected: " + serverSocket.getLocalPort());
-                    node.iterateOverNetwork(new ArrayList<>());
+                    String operation = bufferedReader.readLine();
+                    int argument = Integer.parseInt(bufferedReader.readLine());
+                    String result = this.determineOperation(operation, node, argument);
+                    pw.println(result);
             }
             else if(firstLine.equals("Serve node")){
                     pw.println(node.getPort() + " - " + node.getKey() + ":" + node.getValue());
@@ -50,27 +56,53 @@ public class ClientServerThread extends Thread{
         }
     }
 
-    public int getValue(){
+    public String determineOperation(String operation, Node node, int... arguments){
+        String result = "";
+        if(operation.equals("set-value")){
+            result = setValue(arguments[0], arguments[1]);
+        }
+        else if(operation.equals("get-value")){
+            result = node.getValueRequest(arguments[0], new LinkedList<>());
+        }
+        else if(operation.equals("find-key")){
+            result = findKey(arguments[0]);
+        }
+        else if(operation.equals("get-max")){
+            result = getMax();
+        }
+        else if(operation.equals("get-min")){
+            result = getMin();
+        }
+        else if(operation.equals("new-record")){
+            result = newPair(arguments[0], arguments[1]);
+        }
+        else if(operation.equals("terminate")){
+            terminate(node);
 
-        return Integer.MIN_VALUE;
+        }
+        else {
+            result = "There is no operation " + operation;
+        }
+        return result;
     }
-    public boolean setValue(int key, int value){
-        return false;
+
+    public String setValue(int key, int value){
+        return "Error, couldn't set the value as there is no record with key " + key;
     }
 
     public String findKey(int key){
-        return "";
+        return "Error, there is not any node containing key " + key;
     }
-    public int getMax(){
-        return 0;
+    public String getMax(){
+        return "0";
     }
-    public int getMin(){
-        return 0;
+    public String getMin(){
+        return "0";
     }
-    public void newPair(int key, int value){
-
+    public String newPair(int key, int value){
+       return "OK";
     }
-    public void terminate(){
+    public void terminate(Node node){
 
     }
 }
