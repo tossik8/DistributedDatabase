@@ -23,8 +23,7 @@ public class ClientServerThread extends Thread{
             PrintWriter pw = new PrintWriter(serverSocket.getOutputStream(), true);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
             String firstLine = bufferedReader.readLine();
-            switch (firstLine) {
-                case "Connect node" -> {
+            if (firstLine.equals("Connect node")) {
                     String newNode = bufferedReader.readLine();
                     node.getConnectedNodes().add(newNode);
                     System.out.println(node.getIp() + " " + node.getPort() + " is connected to: ");
@@ -32,21 +31,20 @@ public class ClientServerThread extends Thread{
                         System.out.print(s + " ");
                     }
                     System.out.println();
-                }
-                case "Serve client" -> {
+            }
+            else if(firstLine.equals("Serve client")){
                     pw.println("Connected: " + serverSocket.getLocalPort());
                     node.iterateOverNetwork(new ArrayList<>());
-                }
-                case "Serve node" -> {
+            }
+            else if(firstLine.equals("Serve node")){
                     pw.println(node.getPort() + " - " + node.getKey() + ":" + node.getValue());
-                }
-                case "Provide node" -> {
+            }
+            else if(firstLine.equals("Provide node")){
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(serverSocket.getOutputStream());
                     objectOutputStream.writeObject(node);
                     objectOutputStream.flush();
                     objectOutputStream.close();
                 }
-            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

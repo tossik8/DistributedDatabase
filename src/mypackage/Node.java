@@ -11,7 +11,7 @@ public class Node implements Serializable {
     private final String ip;
     private int key;
     private int value;
-    @Serial
+
     private static final long serialVersionUID = 6529685098267757690L; //ensures serialization and deserialization
     private List<String> connectedNodes;
 
