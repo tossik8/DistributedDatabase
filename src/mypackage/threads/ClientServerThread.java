@@ -23,13 +23,15 @@ public class ClientServerThread extends Thread{
             PrintWriter pw = new PrintWriter(serverSocket.getOutputStream(), true);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
             String firstLine = bufferedReader.readLine();
-            System.out.println(firstLine);
             if(firstLine.equals("Connect node")){
-                node.getConnectedNodes().add(Integer.parseInt(bufferedReader.readLine()));
-//                System.out.println("Connected nodes");
-//                for(int port : node.getConnectedNodes()){
-//                    System.out.println(port);
-//                }
+                String newNode = bufferedReader.readLine();
+                node.getConnectedNodes().add(newNode);
+                System.out.println(node.getIp() + " " +node.getPort() + " is connected to: ");
+                for(String s : node.getConnectedNodes()){
+                    System.out.print(s + " ");
+                }
+                System.out.println();
+
             }
             else if(firstLine.equals("Serve client")){
                 pw.println("Connected: " + serverSocket.getLocalPort());
@@ -73,9 +75,5 @@ public class ClientServerThread extends Thread{
     }
     public void terminate(){
 
-    }
-
-    public DatabaseNode getNode() {
-        return node;
     }
 }

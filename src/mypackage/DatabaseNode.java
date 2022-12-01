@@ -2,11 +2,11 @@ package mypackage;
 
 import mypackage.threads.ClientServerThread;
 
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
 import java.util.LinkedList;
 import java.util.List;
+
 
 public class DatabaseNode implements Serializable {
     public static void main(String[] args) {
@@ -19,19 +19,25 @@ public class DatabaseNode implements Serializable {
             String[] arr = args[3].split(":");
             int key = Integer.parseInt(arr[0]);
             int value = Integer.parseInt(arr[1]);
-            List<Integer> addresses = new LinkedList<>();
-            DatabaseNode node = new DatabaseNode(port, "localhost", key, value, addresses);
+            List<String> addresses = new LinkedList<>();
+            DatabaseNode node = new DatabaseNode(port, "192.168.0.94", key, value, addresses);
             for(int i = 5; i < args.length; i+=2){
                 if(args[i-1].equals("-connect")){
                     String[] address = args[i].split(":");
-                    if(connectNode(Integer.parseInt(address[1]), node.port)){
-                        addresses.add(Integer.parseInt(address[1]));
+                    if(connectNode(address[0],Integer.parseInt(address[1]), node.port)){
+                        addresses.add(args[i]);
+                        System.out.println(args[i]);
                     }
                 }
                 else{
                     System.out.println("Wrong argument\nExpected -connect. Received " + args[i-1]);
                 }
             }
+            System.out.print("The new node listens on port " + node.port + ", contains the value of " + node.value + " under the key " + node.key+"\nConnected to nodes: ");
+            for(String neighbour:node.getConnectedNodes()){
+                System.out.println(neighbour);
+            }
+            System.out.println();
             node.listen();
 
         }catch (NumberFormatException e){
@@ -41,17 +47,18 @@ public class DatabaseNode implements Serializable {
         }
     }
     private int port;
-    private String ip;
+    private final String ip;
     private int key;
     private int value;
 
+    @Serial
     private static final long serialVersionUID = 6529685098267757690L; //ensures serialization and deserialization
-    private List<Integer> connectedNodes;
+    private List<String> connectedNodes;
 
 
     private transient ServerSocket serverSocket; //transient for not serializing the server
 
-    public DatabaseNode(int port, String ip, int key, int value, List<Integer> addresses) {
+    public DatabaseNode(int port, String ip, int key, int value, List<String> addresses) {
         this.ip = ip;
         this.key = key;
         this.value = value;
@@ -60,9 +67,7 @@ public class DatabaseNode implements Serializable {
     }
 
 
-
     public void listen() {
-        System.out.println("The new node listens on port " + port + ", contains the value of " + value + " under the key " + key);
         while(true){
             try {
                 Socket request = serverSocket.accept();
@@ -113,15 +118,15 @@ public class DatabaseNode implements Serializable {
         return value;
     }
 
-    public List<Integer> getConnectedNodes() {
+    public List<String> getConnectedNodes() {
         return connectedNodes;
     }
 
-    public static boolean connectNode(int port, int newPort){
-        try(Socket socket = new Socket("localhost", port)) {
+    public static boolean connectNode(String ip,int port, int newPort){
+        try(Socket socket = new Socket(ip, port)) {
             PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
             pw.println("Connect node");
-            pw.println(newPort);
+            pw.println(ip+":"+newPort);
             pw.close();
         }catch (ConnectException e){
             return false;
@@ -132,7 +137,7 @@ public class DatabaseNode implements Serializable {
         return true;
     }
 
-    public void iterateOverNetwork(List<Integer> visitedNodes) {
+    public void iterateOverNetwork(List<String> visitedNodes) {
         PrintWriter printWriter;
 //        for (int portNode : this.getConnectedNodes()) {
 //            if (!visitedNodes.contains(portNode)) {
@@ -147,9 +152,10 @@ public class DatabaseNode implements Serializable {
 //                }
 //            }
 //        }
-        for (int portNode : this.connectedNodes) {
-            if(!visitedNodes.contains(portNode)) {
-                try (Socket socket = new Socket("localhost", portNode)) {
+        for (String address : this.connectedNodes) {
+            if(!visitedNodes.contains(address)) {
+                int portNode = Integer.parseInt(address.split(":")[1]);
+                try (Socket socket = new Socket(address.split(":")[0], portNode)) {
                     {
                         printWriter = new PrintWriter(socket.getOutputStream(), true);
                         printWriter.println("Provide node");
@@ -158,7 +164,7 @@ public class DatabaseNode implements Serializable {
                         DatabaseNode node = (DatabaseNode) objectInputStream.readObject();
                         objectInputStream.close();
                         System.out.println("Received object " + node.port);
-                        visitedNodes.add(portNode);
+                        visitedNodes.add(address);
                         node.iterateOverNetwork(visitedNodes);
                     }
 
