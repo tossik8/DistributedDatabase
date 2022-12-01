@@ -87,6 +87,7 @@ public class Node implements Serializable {
             pw.println(ip+":"+newPort);
             pw.close();
         }catch (ConnectException e){
+            System.err.println("Failed to connect to " + ip + ":" + port);
             return false;
         }
         catch (IOException e) {
