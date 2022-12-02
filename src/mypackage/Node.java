@@ -159,4 +159,43 @@ public class Node implements Serializable {
         }
         return "Error, there is no record with the key of " + key;
     }
+    public String setValueRequest(int key, int value){
+        return "Error, couldn't set the value as there is no record with key " + key;
+    }
+
+    public String findKeyRequest(int key, List<String> visitedNodes){
+        if(this.key == key){
+            return key + " can be found at " + this.ip+":"+this.port;
+        }
+        visitedNodes.add(this.ip+":"+this.port);
+        PrintWriter printWriter;
+        for(String address:this.connectedNodes){
+            if(!visitedNodes.contains(address)){
+                try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
+                    printWriter = new PrintWriter(socket.getOutputStream(),true);
+                    printWriter.println("Provide node");
+                    ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+                    Node node = (Node) objectInputStream.readObject();
+                    objectInputStream.close();
+                    return node.findKeyRequest(key, visitedNodes);
+
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return "Error, there is not any node containing key " + key;
+    }
+    public String getMaxRequest(){
+        return "0";
+    }
+    public String getMinRequest(){
+        return "0";
+    }
+    public String newPairRequest(int key, int value){
+        return "OK";
+    }
+    public void terminateRequest(){
+
+    }
 }

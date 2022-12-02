@@ -59,26 +59,26 @@ public class ClientServerThread extends Thread{
     public String determineOperation(String operation, Node node, int... arguments){
         String result = "";
         if(operation.equals("set-value")){
-            result = setValue(arguments[0], arguments[1]);
+            result = node.setValueRequest(arguments[0], arguments[1]);
         }
         else if(operation.equals("get-value")){
             result = node.getValueRequest(arguments[0], new LinkedList<>());
         }
         else if(operation.equals("find-key")){
-            result = findKey(arguments[0]);
+            result = node.findKeyRequest(arguments[0], new LinkedList<>());
         }
         else if(operation.equals("get-max")){
-            result = getMax();
+            result = node.getMaxRequest();
         }
         else if(operation.equals("get-min")){
-            result = getMin();
+            result = node.getMinRequest();
         }
         else if(operation.equals("new-record")){
-            result = newPair(arguments[0], arguments[1]);
+            result = node.newPairRequest(arguments[0], arguments[1]);
         }
         else if(operation.equals("terminate")){
-            terminate(node);
-
+            node.terminateRequest();
+            result = "Node terminated";
         }
         else {
             result = "There is no operation " + operation;
@@ -86,23 +86,5 @@ public class ClientServerThread extends Thread{
         return result;
     }
 
-    public String setValue(int key, int value){
-        return "Error, couldn't set the value as there is no record with key " + key;
-    }
 
-    public String findKey(int key){
-        return "Error, there is not any node containing key " + key;
-    }
-    public String getMax(){
-        return "0";
-    }
-    public String getMin(){
-        return "0";
-    }
-    public String newPair(int key, int value){
-       return "OK";
-    }
-    public void terminate(Node node){
-
-    }
 }
