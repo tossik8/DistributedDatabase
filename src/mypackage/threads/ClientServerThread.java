@@ -3,11 +3,8 @@ package mypackage.threads;
 import mypackage.Node;
 
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class ClientServerThread extends Thread{
     private final Socket serverSocket;
@@ -39,7 +36,7 @@ public class ClientServerThread extends Thread{
                     pw.println("Connected: " + serverSocket.getLocalPort());
                     String operation = bufferedReader.readLine();
                     int argument = Integer.parseInt(bufferedReader.readLine());
-                    String result = this.determineOperation(operation, node, argument);
+                    String result = this.determineOperation(operation,argument);
                     pw.println(result);
             }
             else if(firstLine.equals("Serve node")){
@@ -56,7 +53,7 @@ public class ClientServerThread extends Thread{
         }
     }
 
-    public String determineOperation(String operation, Node node, int... arguments){
+    public String determineOperation(String operation, int... arguments){
         String result = "";
         if(operation.equals("set-value")){
             result = node.setValueRequest(arguments[0], arguments[1]);
@@ -68,10 +65,10 @@ public class ClientServerThread extends Thread{
             result = node.findKeyRequest(arguments[0], new LinkedList<>());
         }
         else if(operation.equals("get-max")){
-            result = node.getMaxRequest();
+            result = node.getMaxRequest(node.getKey(),node.getValue(),new LinkedList<>());
         }
         else if(operation.equals("get-min")){
-            result = node.getMinRequest();
+            result = node.getMinRequest(node.getKey(), node.getValue(), new LinkedList<>());
         }
         else if(operation.equals("new-record")){
             result = node.newPairRequest(arguments[0], arguments[1]);

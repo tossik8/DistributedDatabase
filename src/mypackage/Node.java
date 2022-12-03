@@ -136,20 +136,17 @@ public class Node implements Serializable {
         if (this.key == key) {
             return key + ":" + this.value;
         }
-        PrintWriter printWriter;
+
         visitedNodes.add(this.ip + ":" + this.port);
         for (String address : this.connectedNodes) {
             if (!visitedNodes.contains(address)) {
                 int portNode = Integer.parseInt(address.split(":")[1]);
                 try (Socket socket = new Socket(address.split(":")[0], portNode)) {
                     {
-                        printWriter = new PrintWriter(socket.getOutputStream(), true);
-                        printWriter.println("Provide node");
+                        Node node = getNode(socket);
+                        String result = node.getValueRequest(key, visitedNodes);
+                        if(!result.contains("Error")) return result;
 
-                        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-                        Node node = (Node) objectInputStream.readObject();
-                        objectInputStream.close();
-                        return node.getValueRequest(key, visitedNodes);
                     }
 
                 } catch (IOException | ClassNotFoundException e) {
@@ -159,6 +156,17 @@ public class Node implements Serializable {
         }
         return "Error, there is no record with the key of " + key;
     }
+
+    private static Node getNode(Socket socket) throws IOException, ClassNotFoundException {
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+        printWriter.println("Provide node");
+
+        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+        Node node = (Node) objectInputStream.readObject();
+        objectInputStream.close();
+        return node;
+    }
+
     public String setValueRequest(int key, int value){
         return "Error, couldn't set the value as there is no record with key " + key;
     }
@@ -168,16 +176,12 @@ public class Node implements Serializable {
             return key + " can be found at " + this.ip+":"+this.port;
         }
         visitedNodes.add(this.ip+":"+this.port);
-        PrintWriter printWriter;
         for(String address:this.connectedNodes){
             if(!visitedNodes.contains(address)){
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
-                    printWriter = new PrintWriter(socket.getOutputStream(),true);
-                    printWriter.println("Provide node");
-                    ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-                    Node node = (Node) objectInputStream.readObject();
-                    objectInputStream.close();
-                    return node.findKeyRequest(key, visitedNodes);
+                    Node node = getNode(socket);
+                    String res = node.findKeyRequest(key, visitedNodes);
+                    if(!res.contains("Error")) return res;
 
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
@@ -186,11 +190,35 @@ public class Node implements Serializable {
         }
         return "Error, there is not any node containing key " + key;
     }
-    public String getMaxRequest(){
-        return "0";
+    public String getMaxRequest(int key, int max, List<String> visitedNodes){
+        visitedNodes.add(this.ip+":"+this.port);
+        System.out.println(port + " - " + value);
+        for(String address:this.connectedNodes){
+            if(!visitedNodes.contains(address)){
+                try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
+                    Node node = getNode(socket);
+                    node.getMaxRequest(key, max, visitedNodes);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return this.value > max? this.key+":"+this.value:key+":"+max;
     }
-    public String getMinRequest(){
-        return "0";
+    public String getMinRequest(int key, int min, List<String> visitedNodes){
+        visitedNodes.add(this.ip+":"+this.port);
+        System.out.println(port + " - " + value);
+        for(String address:this.connectedNodes){
+            if(!visitedNodes.contains(address)){
+                try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
+                    Node node = getNode(socket);
+                    return node.getMinRequest(key, min, visitedNodes);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return this.value < min? this.key+":"+this.value:key+":"+min;
     }
     public String newPairRequest(int key, int value){
         return "OK";
