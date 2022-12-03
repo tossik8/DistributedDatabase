@@ -4,8 +4,10 @@ import mypackage.threads.ClientServerThread;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Node implements Serializable {
     private int port;
@@ -190,35 +192,37 @@ public class Node implements Serializable {
         }
         return "Error, there is not any node containing key " + key;
     }
-    public String getMaxRequest(int key, int max, List<String> visitedNodes){
+    public HashMap<Integer, Integer> getMaxRequest(HashMap<Integer, Integer> keyValuePairs, List<String> visitedNodes){
         visitedNodes.add(this.ip+":"+this.port);
-        System.out.println(port + " - " + value);
+        keyValuePairs.put(this.key, this.value);
         for(String address:this.connectedNodes){
             if(!visitedNodes.contains(address)){
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                     Node node = getNode(socket);
-                    node.getMaxRequest(key, max, visitedNodes);
+                    node.getMaxRequest(keyValuePairs, visitedNodes);
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
-        return this.value > max? this.key+":"+this.value:key+":"+max;
+        return keyValuePairs;
     }
-    public String getMinRequest(int key, int min, List<String> visitedNodes){
+
+
+    public HashMap<Integer, Integer> getMinRequest(HashMap<Integer, Integer> keyValuePairs, List<String> visitedNodes){
         visitedNodes.add(this.ip+":"+this.port);
-        System.out.println(port + " - " + value);
+        keyValuePairs.put(this.key, this.value);
         for(String address:this.connectedNodes){
             if(!visitedNodes.contains(address)){
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                     Node node = getNode(socket);
-                    return node.getMinRequest(key, min, visitedNodes);
+                    node.getMinRequest(keyValuePairs,visitedNodes);
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
-        return this.value < min? this.key+":"+this.value:key+":"+min;
+        return keyValuePairs;
     }
     public String newPairRequest(int key, int value){
         return "OK";

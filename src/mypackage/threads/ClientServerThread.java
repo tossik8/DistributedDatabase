@@ -4,7 +4,9 @@ import mypackage.Node;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class ClientServerThread extends Thread{
     private final Socket serverSocket;
@@ -35,8 +37,8 @@ public class ClientServerThread extends Thread{
             else if(firstLine.equals("Serve client")){
                     pw.println("Connected: " + serverSocket.getLocalPort());
                     String operation = bufferedReader.readLine();
-                    int argument = Integer.parseInt(bufferedReader.readLine());
-                    String result = this.determineOperation(operation,argument);
+                    //int argument = Integer.parseInt(bufferedReader.readLine());
+                    String result = this.determineOperation(operation);
                     pw.println(result);
             }
             else if(firstLine.equals("Serve node")){
@@ -65,10 +67,10 @@ public class ClientServerThread extends Thread{
             result = node.findKeyRequest(arguments[0], new LinkedList<>());
         }
         else if(operation.equals("get-max")){
-            result = node.getMaxRequest(node.getKey(),node.getValue(),new LinkedList<>());
+            result = findMax(node.getMaxRequest(new HashMap<>(),new LinkedList<>()));
         }
         else if(operation.equals("get-min")){
-            result = node.getMinRequest(node.getKey(), node.getValue(), new LinkedList<>());
+            result = findMin(node.getMinRequest(new HashMap<>(), new LinkedList<>()));
         }
         else if(operation.equals("new-record")){
             result = node.newPairRequest(arguments[0], arguments[1]);
@@ -83,5 +85,26 @@ public class ClientServerThread extends Thread{
         return result;
     }
 
+    public static String findMax(HashMap<Integer, Integer> keyValuePairs){
+        int key = (int) keyValuePairs.keySet().toArray()[0], max = (int) keyValuePairs.values().toArray()[0];
+        for(Map.Entry<Integer, Integer> entry: keyValuePairs.entrySet()){
+            if(entry.getValue() > max){
+                max = entry.getValue();
+                key = entry.getKey();
+            }
+        }
+        return key+":"+max;
+    }
 
+    public static String findMin(HashMap<Integer, Integer> keyValuePairs) {
+        int key = (int) keyValuePairs.keySet().toArray()[0], min = (int) keyValuePairs.values().toArray()[0];
+        for (Map.Entry<Integer, Integer> entry : keyValuePairs.entrySet()) {
+            if (entry.getValue() < min) {
+                min = entry.getValue();
+                key = entry.getKey();
+            }
+        }
+        return key + ":" + min;
+
+    }
 }
