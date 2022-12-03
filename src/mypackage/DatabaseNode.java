@@ -7,7 +7,7 @@ import java.util.List;
 import static mypackage.Node.connectNode;
 
 
-public class DatabaseNode implements Serializable {
+public class DatabaseNode {
     public static void main(String[] args) {
 
         if(args.length < 3 || ((!args[0].equals("-tcpport") || !args[2].equals("-record")))){

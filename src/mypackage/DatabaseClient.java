@@ -37,7 +37,9 @@ public class DatabaseClient {
                 printWriter.println("Serve client");
                 System.out.println(bufferedReader.readLine());
                 printWriter.println(operation);
-                //printWriter.println(parameters.get(0));
+                for(int parameter : parameters){
+                    printWriter.println(parameter);
+                }
                 System.out.println(bufferedReader.readLine());
                 socket.close();
 

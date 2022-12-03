@@ -37,8 +37,38 @@ public class ClientServerThread extends Thread{
             else if(firstLine.equals("Serve client")){
                     pw.println("Connected: " + serverSocket.getLocalPort());
                     String operation = bufferedReader.readLine();
-                    //int argument = Integer.parseInt(bufferedReader.readLine());
-                    String result = this.determineOperation(operation);
+                    int argument;
+                    int argument1;
+                    String result = "There is no operation " + operation;
+                    if(operation.equals("get-value")){
+                        argument = Integer.parseInt(bufferedReader.readLine());
+                        result = node.getValueRequest(argument, new LinkedList<>());
+                    }
+                    else if(operation.equals("set-value")){
+                        argument = Integer.parseInt(bufferedReader.readLine());
+                        argument1 = Integer.parseInt(bufferedReader.readLine());
+                        result = node.setValueRequest(argument, argument1);
+                    }
+                    else if(operation.equals("find-key")){
+                        argument = Integer.parseInt(bufferedReader.readLine());
+                        result = node.findKeyRequest(argument, new LinkedList<>());
+                    }
+                    else if(operation.equals("get-max")){
+                        result = findMax(node.getMaxRequest(new HashMap<>(),new LinkedList<>()));
+                    }
+                    else if(operation.equals("get-min")){
+                        result = findMin(node.getMinRequest(new HashMap<>(), new LinkedList<>()));
+                    }
+                    else if(operation.equals("new-record")){
+                        argument = Integer.parseInt(bufferedReader.readLine());
+                        argument1 = Integer.parseInt(bufferedReader.readLine());
+                        result = node.newPairRequest(argument, argument1);
+                    }
+                    else if(operation.equals("terminate")){
+                        node.terminateRequest();
+                        result = "Node terminated";
+                    }
+
                     pw.println(result);
             }
             else if(firstLine.equals("Serve node")){
@@ -53,36 +83,6 @@ public class ClientServerThread extends Thread{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public String determineOperation(String operation, int... arguments){
-        String result = "";
-        if(operation.equals("set-value")){
-            result = node.setValueRequest(arguments[0], arguments[1]);
-        }
-        else if(operation.equals("get-value")){
-            result = node.getValueRequest(arguments[0], new LinkedList<>());
-        }
-        else if(operation.equals("find-key")){
-            result = node.findKeyRequest(arguments[0], new LinkedList<>());
-        }
-        else if(operation.equals("get-max")){
-            result = findMax(node.getMaxRequest(new HashMap<>(),new LinkedList<>()));
-        }
-        else if(operation.equals("get-min")){
-            result = findMin(node.getMinRequest(new HashMap<>(), new LinkedList<>()));
-        }
-        else if(operation.equals("new-record")){
-            result = node.newPairRequest(arguments[0], arguments[1]);
-        }
-        else if(operation.equals("terminate")){
-            node.terminateRequest();
-            result = "Node terminated";
-        }
-        else {
-            result = "There is no operation " + operation;
-        }
-        return result;
     }
 
     public static String findMax(HashMap<Integer, Integer> keyValuePairs){
