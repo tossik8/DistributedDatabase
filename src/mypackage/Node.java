@@ -95,45 +95,6 @@ public class Node implements Serializable {
         }
         return true;
     }
-
-    public void iterateOverNetwork(List<String> visitedNodes) {
-        PrintWriter printWriter;
-//        for (int portNode : this.getConnectedNodes()) {
-//            if (!visitedNodes.contains(portNode)) {
-//                try (Socket socket = new Socket("localhost", portNode)) {
-//                    printWriter = new PrintWriter(socket.getOutputStream(), true);
-//                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//                    printWriter.println("Serve node");
-//                    System.out.println(bufferedReader.readLine());
-//                    visitedNodes.add(portNode);
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        }
-        for (String address : this.connectedNodes) {
-            if(!visitedNodes.contains(address)) {
-                int portNode = Integer.parseInt(address.split(":")[1]);
-                try (Socket socket = new Socket(address.split(":")[0], portNode)) {
-                    {
-                        printWriter = new PrintWriter(socket.getOutputStream(), true);
-                        printWriter.println("Provide node");
-
-                        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-                        Node node = (Node) objectInputStream.readObject();
-                        objectInputStream.close();
-                        System.out.println("Received object " + node.port);
-                        visitedNodes.add(address);
-                        node.iterateOverNetwork(visitedNodes);
-                    }
-
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
-
     public String getValueRequest(int key, List<String> visitedNodes) {
         if (this.key == key) {
             return key + ":" + this.value;
