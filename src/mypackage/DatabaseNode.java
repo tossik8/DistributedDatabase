@@ -1,6 +1,5 @@
 package mypackage;
 
-import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,8 +52,5 @@ public class DatabaseNode {
             System.err.println("Couldn't create a DatabaseNode. Make sure values are passed properly and in the correct order\njava mypackage.DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989");
         }
     }
-
-
-
 
 }

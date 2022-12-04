@@ -94,10 +94,6 @@ public class ClientServerThread extends Thread{
                     }
                     else pw.println(result);
 
-
-            }
-            else if(firstLine.equals("Serve node")){
-                    pw.println(node.getPort() + " - " + node.getKey() + ":" + node.getValue());
             }
             else if(firstLine.equals("Provide node")){
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(serverSocket.getOutputStream());

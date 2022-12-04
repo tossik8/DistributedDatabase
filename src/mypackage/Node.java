@@ -26,17 +26,7 @@ public class Node implements Serializable {
         this.connectedNodes = connectedNodes;
 
     }
-    public void listen() {
-        while(!serverSocket.isClosed()){
-            try {
-                Socket request = serverSocket.accept();
-                (new ClientServerThread(request, this)).start();
-            }
-            catch (IOException e) {
-                System.out.println(this.ip + ":" + this.port + " is closed");
-            }
-        }
-    }
+
     public void setValue(int value) {
         this.value = value;
     }
@@ -52,6 +42,10 @@ public class Node implements Serializable {
         }while(true);
         this.port = port;
 
+    }
+
+    public ServerSocket getServerSocket() {
+        return serverSocket;
     }
 
     public void setKey(int key) {
@@ -94,8 +88,16 @@ public class Node implements Serializable {
         return true;
     }
 
-    public ServerSocket getServerSocket() {
-        return serverSocket;
+    public void listen() {
+        while(!serverSocket.isClosed()){
+            try {
+                Socket request = serverSocket.accept();
+                (new ClientServerThread(request, this)).start();
+            }
+            catch (IOException e) {
+                System.out.println(this.ip + ":" + this.port + " is closed");
+            }
+        }
     }
 
     public void disconnectNode(String ip, int port, List<String> addresses){
