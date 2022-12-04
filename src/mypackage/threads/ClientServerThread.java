@@ -34,6 +34,22 @@ public class ClientServerThread extends Thread{
                     }
                     System.out.println();
             }
+            else if(firstLine.equals("Disconnect node")){
+                String address = bufferedReader.readLine();
+                node.getConnectedNodes().remove(address);
+                System.out.println(address + " is no longer connected to " + node.getIp() + " " + node.getPort());
+                String line;
+                while ((line = bufferedReader.readLine()) != null){
+                    if(!node.getConnectedNodes().contains(line) && !(node.getIp()+":"+node.getPort()).equals(line))
+                        node.getConnectedNodes().add(line);
+                }
+                System.out.println(node.getIp() + " " + node.getPort() + " is connected to: ");
+                for (String s : node.getConnectedNodes()) {
+                    System.out.print(s + " ");
+                }
+                System.out.println();
+
+            }
             else if(firstLine.equals("Serve client")){
                     pw.println("Connected: " + serverSocket.getLocalPort());
                     String operation = bufferedReader.readLine();
@@ -43,33 +59,42 @@ public class ClientServerThread extends Thread{
                     if(operation.equals("get-value")){
                         argument = Integer.parseInt(bufferedReader.readLine());
                         result = node.getValueRequest(argument, new LinkedList<>());
+                        pw.println(result);
                     }
                     else if(operation.equals("set-value")){
                         argument = Integer.parseInt(bufferedReader.readLine());
                         argument1 = Integer.parseInt(bufferedReader.readLine());
                         result = node.setValueRequest(argument, argument1);
+                        pw.println(result);
                     }
                     else if(operation.equals("find-key")){
                         argument = Integer.parseInt(bufferedReader.readLine());
                         result = node.findKeyRequest(argument, new LinkedList<>());
+                        pw.println(result);
                     }
                     else if(operation.equals("get-max")){
                         result = findMax(node.getMaxRequest(new HashMap<>(),new LinkedList<>()));
+                        pw.println(result);
                     }
                     else if(operation.equals("get-min")){
                         result = findMin(node.getMinRequest(new HashMap<>(), new LinkedList<>()));
+                        pw.println(result);
                     }
                     else if(operation.equals("new-record")){
                         argument = Integer.parseInt(bufferedReader.readLine());
                         argument1 = Integer.parseInt(bufferedReader.readLine());
                         result = node.newPairRequest(argument, argument1);
+                        pw.println(result);
                     }
                     else if(operation.equals("terminate")){
                         node.terminateRequest();
                         result = "Node terminated";
+                        pw.println(result);
+                        node.getServerSocket().close();
                     }
+                    else pw.println(result);
 
-                    pw.println(result);
+
             }
             else if(firstLine.equals("Serve node")){
                     pw.println(node.getPort() + " - " + node.getKey() + ":" + node.getValue());

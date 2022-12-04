@@ -5,9 +5,7 @@ import mypackage.threads.ClientServerThread;
 import java.io.*;
 import java.net.*;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class Node implements Serializable {
     private int port;
@@ -29,13 +27,13 @@ public class Node implements Serializable {
 
     }
     public void listen() {
-        while(true){
+        while(!serverSocket.isClosed()){
             try {
                 Socket request = serverSocket.accept();
                 (new ClientServerThread(request, this)).start();
             }
             catch (IOException e) {
-                throw new RuntimeException(e);
+                System.out.println(this.ip + ":" + this.port + " is closed");
             }
         }
     }
@@ -94,6 +92,27 @@ public class Node implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public ServerSocket getServerSocket() {
+        return serverSocket;
+    }
+
+    public void disconnectNode(String ip, int port, List<String> addresses){
+        try(Socket socket = new Socket(ip, port)) {
+            PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
+            pw.println("Disconnect node");
+            pw.println(this.ip+":"+this.port);
+            for(String address : addresses){
+                pw.println(address);
+            }
+            pw.close();
+        }catch (ConnectException e){
+            System.err.println("Failed to connect to " + ip + ":" + port);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
     public String getValueRequest(int key, List<String> visitedNodes) {
         if (this.key == key) {
@@ -189,6 +208,10 @@ public class Node implements Serializable {
         return "OK";
     }
     public void terminateRequest(){
-
+        for(int i = 0; i < this.connectedNodes.size(); ++i){
+            String address = this.connectedNodes.get(i);
+            this.disconnectNode(address.split(":")[0],Integer.parseInt(address.split(":")[1]), this.connectedNodes);
+        }
+        this.connectedNodes.clear();
     }
 }
