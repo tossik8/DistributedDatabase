@@ -50,57 +50,53 @@ public class ClientServerThread extends Thread{
                 System.out.println();
 
             }
-            else if(firstLine.equals("Serve client")){
-                    pw.println("Connected: " + serverSocket.getLocalPort());
-                    String operation = bufferedReader.readLine();
-                    int argument;
-                    int argument1;
-                    String result = "There is no operation " + operation;
-                    if(operation.equals("get-value")){
-                        argument = Integer.parseInt(bufferedReader.readLine());
-                        result = node.getValueRequest(argument, new LinkedList<>());
-                        pw.println(result);
-                    }
-                    else if(operation.equals("set-value")){
-                        argument = Integer.parseInt(bufferedReader.readLine());
-                        argument1 = Integer.parseInt(bufferedReader.readLine());
-                        result = node.setValueRequest(argument, argument1);
-                        pw.println(result);
-                    }
-                    else if(operation.equals("find-key")){
-                        argument = Integer.parseInt(bufferedReader.readLine());
-                        result = node.findKeyRequest(argument, new LinkedList<>());
-                        pw.println(result);
-                    }
-                    else if(operation.equals("get-max")){
-                        result = findMax(node.getMaxRequest(new HashMap<>(),new LinkedList<>()));
-                        pw.println(result);
-                    }
-                    else if(operation.equals("get-min")){
-                        result = findMin(node.getMinRequest(new HashMap<>(), new LinkedList<>()));
-                        pw.println(result);
-                    }
-                    else if(operation.equals("new-record")){
-                        argument = Integer.parseInt(bufferedReader.readLine());
-                        argument1 = Integer.parseInt(bufferedReader.readLine());
-                        result = node.newPairRequest(argument, argument1);
-                        pw.println(result);
-                    }
-                    else if(operation.equals("terminate")){
-                        node.terminateRequest();
-                        result = "Node terminated";
-                        pw.println(result);
-                        node.getServerSocket().close();
-                    }
-                    else pw.println(result);
-
-            }
             else if(firstLine.equals("Provide node")){
-                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(serverSocket.getOutputStream());
-                    objectOutputStream.writeObject(node);
-                    objectOutputStream.flush();
-                    objectOutputStream.close();
-                }
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(serverSocket.getOutputStream());
+                objectOutputStream.writeObject(node);
+                objectOutputStream.flush();
+                objectOutputStream.close();
+            }
+            else if(firstLine.equals("get-value")){
+                int argument = Integer.parseInt(bufferedReader.readLine());
+                String result = node.getValueRequest(argument, new LinkedList<>());
+                pw.println(result);
+            }
+            else if(firstLine.equals("set-value")){
+                int argument = Integer.parseInt(bufferedReader.readLine());
+                int argument1 = Integer.parseInt(bufferedReader.readLine());
+                String result = node.setValueRequest(argument, argument1);
+                pw.println(result);
+            }
+            else if(firstLine.equals("find-key")){
+                int argument = Integer.parseInt(bufferedReader.readLine());
+                String result = node.findKeyRequest(argument, new LinkedList<>());
+                pw.println(result);
+            }
+            else if(firstLine.equals("get-max")){
+                String result = findMax(node.getMaxRequest(new HashMap<>(),new LinkedList<>()));
+                pw.println(result);
+            }
+            else if(firstLine.equals("get-min")){
+                String result = findMin(node.getMinRequest(new HashMap<>(), new LinkedList<>()));
+                pw.println(result);
+            }
+            else if(firstLine.equals("new-record")){
+                int argument = Integer.parseInt(bufferedReader.readLine());
+                int argument1 = Integer.parseInt(bufferedReader.readLine());
+                String result = node.newPairRequest(argument, argument1);
+                pw.println(result);
+            }
+            else if(firstLine.equals("terminate")){
+                node.terminateRequest();
+                String result = "Node terminated";
+                pw.println(result);
+                node.getServerSocket().close();
+            }
+            else {
+                pw.println("There is no operation " + firstLine);
+            }
+            serverSocket.close();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
