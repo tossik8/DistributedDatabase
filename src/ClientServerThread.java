@@ -1,7 +1,3 @@
-package mypackage.threads;
-
-import mypackage.Node;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.HashMap;
@@ -56,37 +52,39 @@ public class ClientServerThread extends Thread{
                 objectOutputStream.flush();
                 objectOutputStream.close();
             }
-            else if(firstLine.equals("get-value")){
-                int argument = Integer.parseInt(bufferedReader.readLine());
+            String operation = firstLine.split(" ")[0];
+
+            if(operation.equals("get-value")){
+                int argument = Integer.parseInt(firstLine.split(" ")[1]);
                 String result = node.getValueRequest(argument, new LinkedList<>());
                 pw.println(result);
             }
-            else if(firstLine.equals("set-value")){
-                int argument = Integer.parseInt(bufferedReader.readLine());
-                int argument1 = Integer.parseInt(bufferedReader.readLine());
-                String result = node.setValueRequest(argument, argument1);
+            else if(operation.equals("set-value")){
+                int argument = Integer.parseInt(firstLine.split(" ")[1]);
+                int argument1 = Integer.parseInt(firstLine.split(" ")[2]);
+                String result = node.setValueRequest(argument, argument1, new LinkedList<>());
                 pw.println(result);
             }
-            else if(firstLine.equals("find-key")){
-                int argument = Integer.parseInt(bufferedReader.readLine());
+            else if(operation.equals("find-key")){
+                int argument = Integer.parseInt(firstLine.split(" ")[1]);
                 String result = node.findKeyRequest(argument, new LinkedList<>());
                 pw.println(result);
             }
-            else if(firstLine.equals("get-max")){
+            else if(operation.equals("get-max")){
                 String result = findMax(node.getMaxRequest(new HashMap<>(),new LinkedList<>()));
                 pw.println(result);
             }
-            else if(firstLine.equals("get-min")){
+            else if(operation.equals("get-min")){
                 String result = findMin(node.getMinRequest(new HashMap<>(), new LinkedList<>()));
                 pw.println(result);
             }
-            else if(firstLine.equals("new-record")){
-                int argument = Integer.parseInt(bufferedReader.readLine());
-                int argument1 = Integer.parseInt(bufferedReader.readLine());
+            else if(operation.equals("new-record")){
+                int argument = Integer.parseInt(firstLine.split(" ")[1]);
+                int argument1 = Integer.parseInt(firstLine.split(" ")[2]);
                 String result = node.newPairRequest(argument, argument1);
                 pw.println(result);
             }
-            else if(firstLine.equals("terminate")){
+            else if(operation.equals("terminate")){
                 node.terminateRequest();
                 String result = "Node terminated";
                 pw.println(result);

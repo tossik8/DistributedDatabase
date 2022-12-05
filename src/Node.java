@@ -1,7 +1,3 @@
-package mypackage;
-
-import mypackage.threads.ClientServerThread;
-
 import java.io.*;
 import java.net.*;
 import java.util.HashMap;
@@ -151,11 +147,36 @@ public class Node implements Serializable {
         return node;
     }
 
-    public String setValueRequest(int key, int value){
-        return "Error, couldn't set the value as there is no record with key " + key;
+    public String setValueRequest(int key, int value, List<String> visitedNodes){
+        System.out.println("received");
+        String res = "Error, couldn't set the value as there is no record with key " + key;
+        if(this.key == key){
+            this.value = value;
+            res = "Value " + value + " was set for key " + key;
+        }
+        visitedNodes.add(this.ip + ":"+ this.port);
+        for(String address : this.connectedNodes){
+            if(!visitedNodes.contains(address)){
+                try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
+                    PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+                    writer.println("set-value " + key + " " + value);
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                    String output = bufferedReader.readLine();
+                    if(!output.contains("Error")){
+                        res = output;
+                    }
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return res;
     }
 
     public String findKeyRequest(int key, List<String> visitedNodes){
+        System.out.println("Find-key");
         if(this.key == key){
             return key + " can be found at " + this.ip+":"+this.port;
         }

@@ -1,16 +1,11 @@
-package mypackage;
-
 import java.util.LinkedList;
 import java.util.List;
-
-import static mypackage.Node.connectNode;
-
 
 public class DatabaseNode {
     public static void main(String[] args) {
 
         if(args.length < 3 || ((!args[0].equals("-tcpport") || !args[2].equals("-record")))){
-            System.err.println("Wrong argument names\nExample of execution: java mypackage.DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989");
+            System.err.println("Wrong argument names\nExample of execution: java DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989");
             return;
         }
         try{
@@ -30,7 +25,7 @@ public class DatabaseNode {
                 if(args[i-1].equals("-connect")){
                     String[] address = args[i].split(":");
                     try {
-                        if (connectNode(address[0], Integer.parseInt(address[1]), node.getPort())) {
+                        if (Node.connectNode(address[0], Integer.parseInt(address[1]), node.getPort())) {
                             addresses.add(args[i]);
                         }
                     }catch (ArrayIndexOutOfBoundsException e){
@@ -49,7 +44,7 @@ public class DatabaseNode {
             node.listen();
 
         }catch (NumberFormatException e){
-            System.err.println("Couldn't create a DatabaseNode. Make sure values are passed properly and in the correct order\njava mypackage.DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989");
+            System.err.println("Couldn't create a DatabaseNode. Make sure values are passed properly and in the correct order\njava DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989");
         }
     }
 
