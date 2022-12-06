@@ -50,8 +50,7 @@ public class DatabaseNode {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                try {
-                    Socket socket = new Socket(node.getIp(), node.getPort());
+                try (Socket socket = new Socket(node.getIp(), node.getPort())) {
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     printWriter.println("new-record " + node.getKey() +" " +  node.getValue());
                 } catch (IOException e) {
