@@ -23,12 +23,13 @@ public class DatabaseNode {
                 return;
             }
             List<String> addresses = new LinkedList<>();
-            Node node = new Node(port, "localhost", key, value, addresses);
+            Node node = new Node(port, "192.168.0.94", key, value, addresses);
             for(int i = 5; i < args.length; i+=2){
                 if(args[i-1].equals("-connect")){
                     String[] address = args[i].split(":");
                     try {
-                        if (Node.connectNode(address[0], Integer.parseInt(address[1]), node.getPort())) {
+                        if ((!node.getIp().equals(address[0]) || node.getPort() != Integer.parseInt(address[1])) &&
+                                node.connectNode(address[0], Integer.parseInt(address[1]))) {
                             addresses.add(args[i]);
                         }
                     }catch (ArrayIndexOutOfBoundsException e){

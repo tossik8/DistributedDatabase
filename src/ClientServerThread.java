@@ -1,5 +1,3 @@
-
-
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -117,7 +115,7 @@ public class ClientServerThread extends Thread{
             else if (firstLine.equals("Connect node")) {
                     String newNode = bufferedReader.readLine();
                     node.getConnectedNodes().add(newNode);
-                    System.out.println(node.getIp() + " " + node.getPort() + " is connected to: ");
+                    System.out.print(node.getIp() + " " + node.getPort() + " is connected to: ");
                     for (String s : node.getConnectedNodes()) {
                         System.out.print(s + " ");
                     }
@@ -132,7 +130,7 @@ public class ClientServerThread extends Thread{
                     if(!node.getConnectedNodes().contains(line) && !(node.getIp()+":"+node.getPort()).equals(line))
                         node.getConnectedNodes().add(line);
                 }
-                System.out.println(node.getIp() + " " + node.getPort() + " is connected to: ");
+                System.out.print(node.getIp() + " " + node.getPort() + " is connected to: ");
                 for (String s : node.getConnectedNodes()) {
                     System.out.print(s + " ");
                 }

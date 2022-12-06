@@ -66,11 +66,11 @@ public class Node {
         return connectedNodes;
     }
 
-    public static boolean connectNode(String ip,int port, int newPort){
+    public boolean connectNode(String ip,int port){
         try(Socket socket = new Socket(ip, port)) {
             PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
             pw.println("Connect node");
-            pw.println(ip+":"+newPort);
+            pw.println(this.ip+":"+this.port);
             pw.close();
         }catch (ConnectException e){
             System.err.println("Failed to connect to " + ip + ":" + port);
