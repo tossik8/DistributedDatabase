@@ -2,16 +2,15 @@ import java.io.*;
 import java.net.*;
 import java.util.List;
 
-public class Node implements Serializable {
+public class Node {
     private int port;
     private final String ip;
     private int key;
     private int value;
 
-    private static final long serialVersionUID = 6529685098267757690L; //ensures serialization and deserialization
     private List<String> connectedNodes;
 
-    private transient ServerSocket serverSocket; //transient for not serializing the server
+    private ServerSocket serverSocket;
 
     public Node(int port, String ip, int key, int value, List<String> connectedNodes) {
         setPort(port);

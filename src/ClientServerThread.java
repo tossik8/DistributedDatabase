@@ -23,37 +23,6 @@ public class ClientServerThread extends Thread{
             PrintWriter pw = new PrintWriter(serverSocket.getOutputStream(), true);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
             String firstLine = bufferedReader.readLine();
-            if (firstLine.equals("Connect node")) {
-                    String newNode = bufferedReader.readLine();
-                    node.getConnectedNodes().add(newNode);
-                    System.out.println(node.getIp() + " " + node.getPort() + " is connected to: ");
-                    for (String s : node.getConnectedNodes()) {
-                        System.out.print(s + " ");
-                    }
-                    System.out.println();
-            }
-            else if(firstLine.equals("Disconnect node")){
-                String address = bufferedReader.readLine();
-                node.getConnectedNodes().remove(address);
-                System.out.println(address + " is no longer connected to " + node.getIp() + " " + node.getPort());
-                String line;
-                while ((line = bufferedReader.readLine()) != null){
-                    if(!node.getConnectedNodes().contains(line) && !(node.getIp()+":"+node.getPort()).equals(line))
-                        node.getConnectedNodes().add(line);
-                }
-                System.out.println(node.getIp() + " " + node.getPort() + " is connected to: ");
-                for (String s : node.getConnectedNodes()) {
-                    System.out.print(s + " ");
-                }
-                System.out.println();
-
-            }
-            else if(firstLine.equals("Provide node")){
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(serverSocket.getOutputStream());
-                objectOutputStream.writeObject(node);
-                objectOutputStream.flush();
-                objectOutputStream.close();
-            }
             String[] arguments = firstLine.split(" ");
             String operation = arguments[0];
             if(operation.equals("get-value")){
@@ -145,6 +114,32 @@ public class ClientServerThread extends Thread{
                 pw.println(result);
                 node.getServerSocket().close();
             }
+            else if (firstLine.equals("Connect node")) {
+                    String newNode = bufferedReader.readLine();
+                    node.getConnectedNodes().add(newNode);
+                    System.out.println(node.getIp() + " " + node.getPort() + " is connected to: ");
+                    for (String s : node.getConnectedNodes()) {
+                        System.out.print(s + " ");
+                    }
+                    System.out.println();
+            }
+            else if(firstLine.equals("Disconnect node")){
+                String address = bufferedReader.readLine();
+                node.getConnectedNodes().remove(address);
+                System.out.println(address + " is no longer connected to " + node.getIp() + " " + node.getPort());
+                String line;
+                while ((line = bufferedReader.readLine()) != null){
+                    if(!node.getConnectedNodes().contains(line) && !(node.getIp()+":"+node.getPort()).equals(line))
+                        node.getConnectedNodes().add(line);
+                }
+                System.out.println(node.getIp() + " " + node.getPort() + " is connected to: ");
+                for (String s : node.getConnectedNodes()) {
+                    System.out.print(s + " ");
+                }
+                System.out.println();
+
+            }
+
             else {
                 pw.println("There is no operation " + firstLine);
             }
