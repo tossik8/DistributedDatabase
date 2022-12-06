@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,6 +44,21 @@ public class DatabaseNode {
                 System.out.print(neighbour + " ");
             }
             System.out.println();
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    Socket socket = new Socket(node.getIp(), node.getPort());
+                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                    printWriter.println("new-record " + node.getKey() +" " +  node.getValue());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            thread.start();
             node.listen();
 
         }catch (NumberFormatException e){
