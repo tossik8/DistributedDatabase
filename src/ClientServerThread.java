@@ -32,20 +32,17 @@ public class ClientServerThread extends Thread{
                 pw.println(this.getValue(Integer.parseInt(arguments[1]), visitedNodes));
             }
             else if(operation.equals("set-value")){
-                int argument = Integer.parseInt(arguments[1]);
-                int argument1 = Integer.parseInt(arguments[2]);
                 if(arguments.length > 3){
                     visitedNodes.addAll(Arrays.asList(arguments[3].substring(1, arguments[3].length()-1).split(",")));
                 }
-                pw.println(this.setValue(argument, argument1, visitedNodes));
+                pw.println(this.setValue(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]), visitedNodes));
             }
 
             else if(operation.equals("find-key")){
-                int argument = Integer.parseInt(firstLine.split(" ")[1]);
                 if(arguments.length > 2){
                     visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
                 }
-                String result = this.findKey(argument, visitedNodes);
+                String result = this.findKey(Integer.parseInt(arguments[1]), visitedNodes);
                 pw.println(result);
             }
 
@@ -64,9 +61,7 @@ public class ClientServerThread extends Thread{
             }
 
             else if(operation.equals("new-record")){
-                int argument = Integer.parseInt(firstLine.split(" ")[1]);
-                int argument1 = Integer.parseInt(firstLine.split(" ")[2]);
-                String result = this.newPair(argument, argument1);
+                String result = this.newPair(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]));
                 pw.println(result);
             }
             else if(operation.equals("terminate")){
