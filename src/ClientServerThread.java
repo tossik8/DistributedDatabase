@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,16 +30,10 @@ public class ClientServerThread extends Thread{
                 pw.println(result);
             }
             else if(operation.equals("get-value-node")){
-                List<String> neighbours = new LinkedList<>();
                 int argument = Integer.parseInt(arguments[1]);
-
-                String neighbour;
-
-                while(!(neighbour = bufferedReader.readLine()).equals("closed")){
-                    neighbours.add(neighbour);
-                }
-
-                String result = this.getValue(argument, neighbours);
+                String line = bufferedReader.readLine();
+                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
+                String result = this.getValue(argument, visitedNodes);
                 pw.println(result);
             }
             else if(operation.equals("set-value")){
@@ -48,14 +43,11 @@ public class ClientServerThread extends Thread{
                 pw.println(result);
             }
             else if(operation.equals("set-value-node")){
-                List<String> neighbours = new LinkedList<>();
                 int argument = Integer.parseInt(arguments[1]);
                 int argument1 = Integer.parseInt(arguments[2]);
-                String neighbour;
-                while(!(neighbour = bufferedReader.readLine()).equals("closed")){
-                    neighbours.add(neighbour);
-                }
-                String result = this.setValue(argument, argument1, neighbours);
+                String line = bufferedReader.readLine();
+                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
+                String result = this.setValue(argument, argument1, visitedNodes);
                 pw.println(result);
             }
             else if(operation.equals("find-key")){
@@ -64,13 +56,10 @@ public class ClientServerThread extends Thread{
                 pw.println(result);
             }
             else if(operation.equals("find-key-node")){
-                List<String> neighbours = new LinkedList<>();
                 int argument = Integer.parseInt(firstLine.split(" ")[1]);
-                String neighbour;
-                while(!(neighbour = bufferedReader.readLine()).equals("closed")){
-                    neighbours.add(neighbour);
-                }
-                String result = this.findKey(argument, neighbours);
+                String line = bufferedReader.readLine();
+                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
+                String result = this.findKey(argument, visitedNodes);
                 pw.println(result);
             }
             else if(operation.equals("get-max")){
@@ -79,12 +68,9 @@ public class ClientServerThread extends Thread{
                 pw.println(result);
             }
             else if(operation.equals("get-max-node")){
-                List<String> neighbours = new LinkedList<>();
-                String neighbour;
-                while(!(neighbour = bufferedReader.readLine()).equals("closed")){
-                    neighbours.add(neighbour);
-                }
-                String res = this.getMax(neighbours);
+                String line = bufferedReader.readLine();
+                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
+                String res = this.getMax(visitedNodes);
                 pw.println(res);
             }
             else if(operation.equals("get-min")){
@@ -92,12 +78,9 @@ public class ClientServerThread extends Thread{
                 pw.println(result);
             }
             else if(operation.equals("get-min-node")){
-                List<String> neighbours = new LinkedList<>();
-                String neighbour;
-                while(!(neighbour = bufferedReader.readLine()).equals("closed")){
-                    neighbours.add(neighbour);
-                }
-                String res = this.getMin(neighbours);
+                String line = bufferedReader.readLine();
+                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
+                String res = this.getMin(visitedNodes);
                 pw.println(res);
             }
             else if(operation.equals("new-record")){
@@ -177,13 +160,7 @@ public class ClientServerThread extends Thread{
                         PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         printWriter.println("get-value-node " + key);
-
-                        for(String address2 : visitedNodes){
-
-                            printWriter.println(address2);
-
-                        }
-                        printWriter.println("closed");
+                        printWriter.println(visitedNodes);
                         String result = reader.readLine();
                         if(!result.contains("Error")) return result;
 
@@ -199,7 +176,6 @@ public class ClientServerThread extends Thread{
 
 
     public String setValue(int key, int value, List<String> visitedNodes){
-
         String res = "Error, couldn't set the value as there is no record with key " + key;
         if(key == node.getKey()){
             node.setValue(value);
@@ -212,13 +188,7 @@ public class ClientServerThread extends Thread{
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     printWriter.println("set-value-node " + key + " " + value);
-
-                    for(String address2 : visitedNodes){
-
-                        printWriter.println(address2);
-
-                    }
-                    printWriter.println("closed");
+                    printWriter.println(visitedNodes);
                     String result = reader.readLine();
                     if(!result.contains("Error")) res = result;
 
@@ -240,10 +210,7 @@ public class ClientServerThread extends Thread{
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     printWriter.println("find-key-node " + key);
-                    for(String address2 : visitedNodes){
-                        printWriter.println(address2);
-                    }
-                    printWriter.println("closed");
+                    printWriter.println(visitedNodes);
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String res= bufferedReader.readLine();
                     if(!res.contains("Error")) return res;
@@ -263,10 +230,7 @@ public class ClientServerThread extends Thread{
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     printWriter.println("get-max-node");
-                    for(String address2 : visitedNodes){
-                        printWriter.println(address2);
-                    }
-                    printWriter.println("closed");
+                    printWriter.println(visitedNodes);
                     BufferedReader bufferedReader =new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String max2 = bufferedReader.readLine();
                     if(node.getValue() < Integer.parseInt(max2.split(":")[1])){
@@ -289,10 +253,7 @@ public class ClientServerThread extends Thread{
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     printWriter.println("get-min-node");
-                    for(String address2 : visitedNodes){
-                        printWriter.println(address2);
-                    }
-                    printWriter.println("closed");
+                    printWriter.println(visitedNodes);
                     BufferedReader bufferedReader =new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String min2 = bufferedReader.readLine();
                     if(node.getValue() > Integer.parseInt(min2.split(":")[1])){
@@ -312,10 +273,7 @@ public class ClientServerThread extends Thread{
             try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                 printWriter.println("set-value-node " + key + " " + value);
-                for(String address2 : node.getConnectedNodes()){
-                    printWriter.println(address2);
-                }
-                printWriter.println("closed");
+                printWriter.println(node.getConnectedNodes());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
