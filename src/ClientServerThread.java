@@ -184,7 +184,7 @@ public class ClientServerThread extends Thread{
             if(!visitedNodes.contains(address)){
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                    printWriter.println("find-key " + key + visitedNodes.toString().replace(" ", ""));
+                    printWriter.println("find-key " + key + " " + visitedNodes.toString().replace(" ", ""));
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String res= bufferedReader.readLine();
                     if(!res.contains("Error")) return res;
