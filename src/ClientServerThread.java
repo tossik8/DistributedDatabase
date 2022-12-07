@@ -24,65 +24,45 @@ public class ClientServerThread extends Thread{
             String firstLine = bufferedReader.readLine();
             String[] arguments = firstLine.split(" ");
             String operation = arguments[0];
+            List<String> visitedNodes = new LinkedList<>();
             if(operation.equals("get-value")){
-                int argument = Integer.parseInt(arguments[1]);
-                String result = this.getValue(argument, new LinkedList<>());
-                pw.println(result);
-            }
-            else if(operation.equals("get-value-node")){
-                int argument = Integer.parseInt(arguments[1]);
-                String line = bufferedReader.readLine();
-                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
-                String result = this.getValue(argument, visitedNodes);
-                pw.println(result);
+                if(arguments.length > 2){
+                    visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
+                }
+                pw.println(this.getValue(Integer.parseInt(arguments[1]), visitedNodes));
             }
             else if(operation.equals("set-value")){
                 int argument = Integer.parseInt(arguments[1]);
                 int argument1 = Integer.parseInt(arguments[2]);
-                String result = this.setValue(argument, argument1, new LinkedList<>());
-                pw.println(result);
+                if(arguments.length > 3){
+                    visitedNodes.addAll(Arrays.asList(arguments[3].substring(1, arguments[3].length()-1).split(",")));
+                }
+                pw.println(this.setValue(argument, argument1, visitedNodes));
             }
-            else if(operation.equals("set-value-node")){
-                int argument = Integer.parseInt(arguments[1]);
-                int argument1 = Integer.parseInt(arguments[2]);
-                String line = bufferedReader.readLine();
-                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
-                String result = this.setValue(argument, argument1, visitedNodes);
-                pw.println(result);
-            }
+
             else if(operation.equals("find-key")){
                 int argument = Integer.parseInt(firstLine.split(" ")[1]);
-                String result = this.findKey(argument, new LinkedList<>());
-                pw.println(result);
-            }
-            else if(operation.equals("find-key-node")){
-                int argument = Integer.parseInt(firstLine.split(" ")[1]);
-                String line = bufferedReader.readLine();
-                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
+                if(arguments.length > 2){
+                    visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
+                }
                 String result = this.findKey(argument, visitedNodes);
                 pw.println(result);
             }
-            else if(operation.equals("get-max")){
 
-                String result = this.getMax(new LinkedList<>());
-                pw.println(result);
+            else if(operation.equals("get-max")){
+                if(arguments.length > 1){
+                    visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
+                }
+                pw.println(this.getMax(visitedNodes));
             }
-            else if(operation.equals("get-max-node")){
-                String line = bufferedReader.readLine();
-                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
-                String res = this.getMax(visitedNodes);
-                pw.println(res);
-            }
+
             else if(operation.equals("get-min")){
-                String result = this.getMin(new LinkedList<>());
-                pw.println(result);
+                if(arguments.length > 1){
+                    visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
+                }
+                pw.println(this.getMin(visitedNodes));
             }
-            else if(operation.equals("get-min-node")){
-                String line = bufferedReader.readLine();
-                List<String> visitedNodes = new LinkedList<>(Arrays.asList(line.substring(1, line.length()-1).split(", ")));
-                String res = this.getMin(visitedNodes);
-                pw.println(res);
-            }
+
             else if(operation.equals("new-record")){
                 int argument = Integer.parseInt(firstLine.split(" ")[1]);
                 int argument1 = Integer.parseInt(firstLine.split(" ")[2]);
@@ -159,8 +139,9 @@ public class ClientServerThread extends Thread{
                     {
                         PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                        printWriter.println("get-value-node " + key);
-                        printWriter.println(visitedNodes);
+
+                        printWriter.println("get-value " + key + " " +
+                                visitedNodes.toString().replace(" ", ""));
                         String result = reader.readLine();
                         if(!result.contains("Error")) return result;
 
@@ -187,8 +168,7 @@ public class ClientServerThread extends Thread{
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))) {
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    printWriter.println("set-value-node " + key + " " + value);
-                    printWriter.println(visitedNodes);
+                    printWriter.println("set-value " + key + " " + value + " " + visitedNodes.toString().replace(" ", ""));
                     String result = reader.readLine();
                     if(!result.contains("Error")) res = result;
 
@@ -209,8 +189,7 @@ public class ClientServerThread extends Thread{
             if(!visitedNodes.contains(address)){
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                    printWriter.println("find-key-node " + key);
-                    printWriter.println(visitedNodes);
+                    printWriter.println("find-key " + key + visitedNodes.toString().replace(" ", ""));
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String res= bufferedReader.readLine();
                     if(!res.contains("Error")) return res;
@@ -229,8 +208,7 @@ public class ClientServerThread extends Thread{
             if(!visitedNodes.contains(address)){
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                    printWriter.println("get-max-node");
-                    printWriter.println(visitedNodes);
+                    printWriter.println("get-max " + visitedNodes.toString().replace(" ", ""));
                     BufferedReader bufferedReader =new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String max2 = bufferedReader.readLine();
                     if(node.getValue() < Integer.parseInt(max2.split(":")[1])){
@@ -252,8 +230,7 @@ public class ClientServerThread extends Thread{
             if(!visitedNodes.contains(address)){
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                    printWriter.println("get-min-node");
-                    printWriter.println(visitedNodes);
+                    printWriter.println("get-min " + visitedNodes.toString().replace(" ", ""));
                     BufferedReader bufferedReader =new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String min2 = bufferedReader.readLine();
                     if(node.getValue() > Integer.parseInt(min2.split(":")[1])){
@@ -272,8 +249,7 @@ public class ClientServerThread extends Thread{
         for(String address : node.getConnectedNodes()){
             try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                printWriter.println("set-value-node " + key + " " + value);
-                printWriter.println(node.getConnectedNodes());
+                printWriter.println("set-value " + key + " " + value + " " + node.getConnectedNodes().toString().replace(" ", ""));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
