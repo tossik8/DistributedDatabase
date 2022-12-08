@@ -17,6 +17,7 @@ public class ClientServerThread extends Thread{
 
     @Override
     public void run() {
+
         super.run();
         try {
             PrintWriter pw = new PrintWriter(serverSocket.getOutputStream(), true);
@@ -79,14 +80,15 @@ public class ClientServerThread extends Thread{
                     }
                     System.out.println();
             }
-            else if(firstLine.equals("Disconnect node")){
-                String address = bufferedReader.readLine();
-                node.getConnectedNodes().remove(address);
-                System.out.println(address + " is no longer connected to " + node.getIp() + " " + node.getPort());
-                String line;
-                while ((line = bufferedReader.readLine()) != null){
-                    if(!node.getConnectedNodes().contains(line) && !(node.getIp()+":"+node.getPort()).equals(line))
-                        node.getConnectedNodes().add(line);
+            else if(operation.equals("disconnect-node")){
+
+                node.getConnectedNodes().remove(arguments[1]);
+
+                System.out.println(arguments[1] + " is no longer connected to " + node.getIp() + " " + node.getPort());
+                List<String> neighbours = new LinkedList<>(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
+                for(String neighbour : neighbours){
+                    if(!node.getConnectedNodes().contains(neighbour) && !(node.getIp()+":"+node.getPort()).equals(neighbour))
+                        node.getConnectedNodes().add(neighbour);
                 }
                 System.out.print(node.getIp() + " " + node.getPort() + " is connected to: ");
                 for (String s : node.getConnectedNodes()) {
@@ -105,17 +107,13 @@ public class ClientServerThread extends Thread{
             throw new RuntimeException(e);
         }
     }
-    public void disconnectNode(String ip, int port, List<String> addresses){
-        try(Socket socket = new Socket(ip, port)) {
+    public void disconnectNode(String nodeAddress, List<String> addresses){
+        try(Socket socket = new Socket(nodeAddress.split(":")[0], Integer.parseInt(nodeAddress.split(":")[1]))) {
             PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
-            pw.println("Disconnect node");
-            pw.println(node.getIp()+":"+node.getPort());
-            for(String address : addresses){
-                pw.println(address);
-            }
+            pw.println("disconnect-node " + node.getIp()+":"+node.getPort() + " " +addresses.toString().replace(" ", ""));
             pw.close();
         }catch (ConnectException e){
-            System.err.println("Failed to connect to " + ip + ":" + port);
+            System.err.println("Failed to connect to " + nodeAddress.split(" ")[0] + ":" + nodeAddress.split(" ")[1]);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -254,7 +252,7 @@ public class ClientServerThread extends Thread{
     public void terminate(){
         for(int i = 0; i < node.getConnectedNodes().size(); ++i){
             String address = node.getConnectedNodes().get(i);
-            this.disconnectNode(address.split(":")[0],Integer.parseInt(address.split(":")[1]), node.getConnectedNodes());
+            this.disconnectNode(address, node.getConnectedNodes());
         }
         node.getConnectedNodes().clear();
     }
