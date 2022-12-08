@@ -18,9 +18,7 @@ public class ClientServerThread extends Thread{
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()))){
             String firstLine = bufferedReader.readLine();
             String[] arguments = firstLine.split(" ");
-            String operation = arguments[0];
-            List<String> visitedNodes = new LinkedList<>();
-            this.executeOperation(pw, firstLine, arguments, operation, visitedNodes);
+            this.executeOperation(pw, firstLine, arguments, arguments[0], new LinkedList<>());
             serverSocket.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -63,9 +61,7 @@ public class ClientServerThread extends Thread{
         else if(operation.equals("terminate")){
             this.terminate();
             pw.println("Node terminated");
-
             node.getServerSocket().close();
-
         }
         else if (operation.equals("connect-node")) {
             node.getConnectedNodes().add(arguments[1]);
