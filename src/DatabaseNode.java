@@ -6,7 +6,6 @@ import java.util.List;
 
 public class DatabaseNode {
     public static void main(String[] args) {
-
         if(args.length < 3 || ((!args[0].equals("-tcpport") || !args[2].equals("-record")))){
             System.err.println("Wrong argument names\nExample of execution: java DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989");
             return;
@@ -60,10 +59,8 @@ public class DatabaseNode {
             });
             thread.start();
             node.listen();
-
-        }catch (NumberFormatException e){
+        } catch (NumberFormatException e){
             System.err.println("Couldn't create a DatabaseNode. Make sure values are passed properly and in the correct order\njava DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989");
         }
     }
-
 }

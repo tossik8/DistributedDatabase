@@ -7,24 +7,18 @@ public class Node {
     private final String ip;
     private int key;
     private int value;
-
     private List<String> connectedNodes;
-
     private ServerSocket serverSocket;
-
     public Node(int port, String ip, int key, int value, List<String> connectedNodes) {
         setPort(port);
         this.ip = ip;
         this.key = key;
         this.value = value;
         this.connectedNodes = connectedNodes;
-
     }
-
     public void setValue(int value) {
         this.value = value;
     }
-
     public void setPort(int port) {
         do{
             try{
@@ -35,37 +29,28 @@ public class Node {
             }
         }while(true);
         this.port = port;
-
     }
-
     public ServerSocket getServerSocket() {
         return serverSocket;
     }
-
     public void setKey(int key) {
         this.key = key;
     }
-
     public int getPort() {
         return port;
     }
-
     public String getIp() {
         return ip;
     }
-
     public int getKey() {
         return key;
     }
-
     public int getValue() {
         return value;
     }
-
     public List<String> getConnectedNodes() {
         return connectedNodes;
     }
-
     public boolean connectNode(String ip,int port){
         try(Socket socket = new Socket(ip, port)) {
             PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
@@ -80,7 +65,6 @@ public class Node {
         }
         return true;
     }
-
     public void listen() {
         while(!serverSocket.isClosed()){
             try {
@@ -92,6 +76,4 @@ public class Node {
             }
         }
     }
-
-
 }

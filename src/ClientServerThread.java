@@ -8,111 +8,90 @@ import java.util.List;
 public class ClientServerThread extends Thread{
     private final Socket serverSocket;
     private final Node node;
-
-
     public ClientServerThread(Socket serverSocket, Node node) {
         this.serverSocket = serverSocket;
         this.node = node;
     }
-
     @Override
     public void run() {
-
-        super.run();
         try (PrintWriter pw = new PrintWriter(serverSocket.getOutputStream(), true);
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()))){
             String firstLine = bufferedReader.readLine();
             String[] arguments = firstLine.split(" ");
             String operation = arguments[0];
             List<String> visitedNodes = new LinkedList<>();
-            if(operation.equals("get-value")){
-                if(arguments.length > 2){
-                    visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
-                }
-                pw.println(this.getValue(Integer.parseInt(arguments[1]), visitedNodes));
-            }
-            else if(operation.equals("set-value")){
-                if(arguments.length > 3){
-                    visitedNodes.addAll(Arrays.asList(arguments[3].substring(1, arguments[3].length()-1).split(",")));
-                }
-                pw.println(this.setValue(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]), visitedNodes));
-            }
-
-            else if(operation.equals("find-key")){
-                if(arguments.length > 2){
-                    visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
-                }
-                pw.println(this.findKey(Integer.parseInt(arguments[1]), visitedNodes));
-            }
-
-            else if(operation.equals("get-max")){
-                if(arguments.length > 1){
-                    visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
-                }
-                pw.println(this.getMax(visitedNodes));
-            }
-
-            else if(operation.equals("get-min")){
-                if(arguments.length > 1){
-                    visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
-                }
-                pw.println(this.getMin(visitedNodes));
-            }
-
-            else if(operation.equals("new-record")){
-                pw.println(this.newPair(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2])));
-            }
-            else if(operation.equals("terminate")){
-                this.terminate();
-                pw.println("Node terminated");
-                node.getServerSocket().close();
-            }
-            else if (operation.equals("connect-node")) {
-                    node.getConnectedNodes().add(arguments[1]);
-                    System.out.print(node.getIp() + " " + node.getPort() + " is connected to: ");
-                    for (String s : node.getConnectedNodes()) {
-                        System.out.print(s + " ");
-                    }
-                    System.out.println();
-            }
-            else if(operation.equals("disconnect-node")){
-
-                node.getConnectedNodes().remove(arguments[1]);
-
-                System.out.println(arguments[1] + " is no longer connected to " + node.getIp() + " " + node.getPort());
-                List<String> neighbours = new LinkedList<>(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
-                for(String neighbour : neighbours){
-                    if(!node.getConnectedNodes().contains(neighbour) && !(node.getIp()+":"+node.getPort()).equals(neighbour))
-                        node.getConnectedNodes().add(neighbour);
-                }
-                System.out.print(node.getIp() + " " + node.getPort() + " is connected to: ");
-                for (String s : node.getConnectedNodes()) {
-                    System.out.print(s + " ");
-                }
-                System.out.println();
-
-            }
-
-            else {
-                pw.println("There is no operation " + firstLine);
-            }
+            this.executeOperation(pw, firstLine, arguments, operation, visitedNodes);
             serverSocket.close();
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-    public void disconnectNode(String nodeAddress, List<String> addresses){
-        try(Socket socket = new Socket(nodeAddress.split(":")[0], Integer.parseInt(nodeAddress.split(":")[1]))) {
-            PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
-            pw.println("disconnect-node " + node.getIp()+":"+node.getPort() + " " +addresses.toString().replace(" ", ""));
-            pw.close();
-        }catch (ConnectException e){
-            System.err.println("Failed to connect to " + nodeAddress.split(" ")[0] + ":" + nodeAddress.split(" ")[1]);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void executeOperation(PrintWriter pw, String firstLine, String[] arguments, String operation, List<String> visitedNodes) throws IOException {
+        if(operation.equals("get-value")){
+            if(arguments.length > 2){
+                visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
+            }
+            pw.println(this.getValue(Integer.parseInt(arguments[1]), visitedNodes));
         }
+        else if(operation.equals("set-value")){
+            if(arguments.length > 3){
+                visitedNodes.addAll(Arrays.asList(arguments[3].substring(1, arguments[3].length()-1).split(",")));
+            }
+            pw.println(this.setValue(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]), visitedNodes));
+        }
+        else if(operation.equals("find-key")){
+            if(arguments.length > 2){
+                visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
+            }
+            pw.println(this.findKey(Integer.parseInt(arguments[1]), visitedNodes));
+        }
+        else if(operation.equals("get-max")){
+            if(arguments.length > 1){
+                visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
+            }
+            pw.println(this.getMax(visitedNodes));
+        }
+        else if(operation.equals("get-min")){
+            if(arguments.length > 1){
+                visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
+            }
+            pw.println(this.getMin(visitedNodes));
+        }
+        else if(operation.equals("new-record")){
+            pw.println(this.newPair(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2])));
+        }
+        else if(operation.equals("terminate")){
+            this.terminate();
+            pw.println("Node terminated");
 
+            node.getServerSocket().close();
+
+        }
+        else if (operation.equals("connect-node")) {
+            node.getConnectedNodes().add(arguments[1]);
+            this.printConnectedNodes();
+        }
+        else if(operation.equals("disconnect-node")){
+            node.getConnectedNodes().remove(arguments[1]);
+            System.out.println(arguments[1] + " is no longer connected to " + node.getIp() + " " + node.getPort());
+            List<String> neighbours = new LinkedList<>(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
+            for(String neighbour : neighbours){
+                if(!node.getConnectedNodes().contains(neighbour) && !(node.getIp()+":"+node.getPort()).equals(neighbour))
+                    node.getConnectedNodes().add(neighbour);
+            }
+            this.printConnectedNodes();
+        }
+        else {
+            pw.println("There is no operation " + firstLine);
+        }
+    }
+
+    public void printConnectedNodes(){
+        System.out.print(node.getIp() + " " + node.getPort() + " is connected to: ");
+        for (String s : node.getConnectedNodes()) {
+            System.out.print(s + " ");
+        }
+        System.out.println();
     }
     public String getValue(int key, List<String> visitedNodes) {
         if (node.getKey() == key) {
@@ -142,8 +121,6 @@ public class ClientServerThread extends Thread{
         }
         return "Error, there is no record with the key of " + key;
     }
-
-
     public String setValue(int key, int value, List<String> visitedNodes){
         String res = "Error, couldn't set the value as there is no record with key " + key;
         if(key == node.getKey()){
@@ -208,7 +185,6 @@ public class ClientServerThread extends Thread{
             }
         }
         return max;
-
     }
 
     public String getMin(List<String> visitedNodes){
@@ -250,5 +226,16 @@ public class ClientServerThread extends Thread{
             this.disconnectNode(address, node.getConnectedNodes());
         }
         node.getConnectedNodes().clear();
+    }
+    public void disconnectNode(String nodeAddress, List<String> addresses){
+        try(Socket socket = new Socket(nodeAddress.split(":")[0], Integer.parseInt(nodeAddress.split(":")[1]))) {
+            PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
+            pw.println("disconnect-node " + node.getIp()+":"+node.getPort() + " " +addresses.toString().replace(" ", ""));
+            pw.close();
+        }catch (ConnectException e){
+            System.err.println("Failed to connect to " + nodeAddress.split(" ")[0] + ":" + nodeAddress.split(" ")[1]);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
