@@ -69,8 +69,7 @@ public class Node {
     public boolean connectNode(String ip,int port){
         try(Socket socket = new Socket(ip, port)) {
             PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
-            pw.println("Connect node");
-            pw.println(this.ip+":"+this.port);
+            pw.println("connect-node " + this.ip+":"+this.port);
             pw.close();
         }catch (ConnectException e){
             System.err.println("Failed to connect to " + ip + ":" + port);

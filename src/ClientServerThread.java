@@ -19,9 +19,8 @@ public class ClientServerThread extends Thread{
     public void run() {
 
         super.run();
-        try {
-            PrintWriter pw = new PrintWriter(serverSocket.getOutputStream(), true);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+        try (PrintWriter pw = new PrintWriter(serverSocket.getOutputStream(), true);
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()))){
             String firstLine = bufferedReader.readLine();
             String[] arguments = firstLine.split(" ");
             String operation = arguments[0];
@@ -43,8 +42,7 @@ public class ClientServerThread extends Thread{
                 if(arguments.length > 2){
                     visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
                 }
-                String result = this.findKey(Integer.parseInt(arguments[1]), visitedNodes);
-                pw.println(result);
+                pw.println(this.findKey(Integer.parseInt(arguments[1]), visitedNodes));
             }
 
             else if(operation.equals("get-max")){
@@ -62,18 +60,15 @@ public class ClientServerThread extends Thread{
             }
 
             else if(operation.equals("new-record")){
-                String result = this.newPair(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]));
-                pw.println(result);
+                pw.println(this.newPair(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2])));
             }
             else if(operation.equals("terminate")){
                 this.terminate();
-                String result = "Node terminated";
-                pw.println(result);
+                pw.println("Node terminated");
                 node.getServerSocket().close();
             }
-            else if (firstLine.equals("Connect node")) {
-                    String newNode = bufferedReader.readLine();
-                    node.getConnectedNodes().add(newNode);
+            else if (operation.equals("connect-node")) {
+                    node.getConnectedNodes().add(arguments[1]);
                     System.out.print(node.getIp() + " " + node.getPort() + " is connected to: ");
                     for (String s : node.getConnectedNodes()) {
                         System.out.print(s + " ");
