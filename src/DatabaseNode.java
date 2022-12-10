@@ -39,7 +39,7 @@ public class DatabaseNode {
                     System.err.println("Wrong argument\nExpected -connect. Received " + args[i-1]);
                 }
             }
-            System.out.print("The new node listens on port " + node.getPort() + ", contains the value of " + node.getValue() + " under the key " + node.getKey()+"\nConnected to nodes: ");
+            System.out.print("The new node listens on " + node.getIp() + ":" + node.getPort() + ", contains the value of " + node.getValue() + " under the key " + node.getKey()+"\nConnected to nodes: ");
             for(String neighbour:node.getConnectedNodes()){
                 System.out.print(neighbour + " ");
             }
