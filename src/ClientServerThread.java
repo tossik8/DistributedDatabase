@@ -93,7 +93,6 @@ public class ClientServerThread extends Thread{
         if (node.getKey() == key) {
             return key + ":" + node.getValue();
         }
-
         visitedNodes.add(node.getIp() + ":" + node.getPort());
         for (String address : node.getConnectedNodes()) {
             if (!visitedNodes.contains(address)) {
