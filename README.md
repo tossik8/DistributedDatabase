@@ -104,4 +104,4 @@ from their lists of connected nodes.
 
 ## Author
 
-Mykyta Toropov
+[Mykyta Toropov](https://www.facebook.com/nikita.toropov.54)
