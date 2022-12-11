@@ -60,7 +60,7 @@ public class ClientServerThread extends Thread{
         }
         else if(operation.equals("terminate")){
             this.terminate();
-            pw.println("Node terminated");
+            pw.println("OK");
             node.getServerSocket().close();
         }
         else if (operation.equals("connect-node")) {
@@ -99,26 +99,21 @@ public class ClientServerThread extends Thread{
             if (!visitedNodes.contains(address)) {
                 int portNode = Integer.parseInt(address.split(":")[1]);
                 try (Socket socket = new Socket(address.split(":")[0], portNode)) {
-                    {
-                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-                        printWriter.println("get-value " + key + " " +
-                                visitedNodes.toString().replace(" ", ""));
-                        String result = reader.readLine();
-                        if(!result.contains("Error")) return result;
-
-                    }
+                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    printWriter.println("get-value " + key + " " + visitedNodes.toString().replace(" ", ""));
+                    String result = reader.readLine();
+                    if(!result.equals("ERROR")) return result;
 
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
-        return "Error, there is no record with the key of " + key;
+        return "ERROR";
     }
     public String setValue(int key, int value, List<String> visitedNodes){
-        String res = "Error, couldn't set the value as there is no record with key " + key;
+        String res = "ERROR";
         if(key == node.getKey()){
             node.setValue(value);
             res = key + ":" + value;
@@ -131,7 +126,7 @@ public class ClientServerThread extends Thread{
                     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     printWriter.println("set-value " + key + " " + value + " " + visitedNodes.toString().replace(" ", ""));
                     String result = reader.readLine();
-                    if(!result.contains("Error")) res = result;
+                    if(!result.equals("ERROR")) res = result;
 
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -143,7 +138,7 @@ public class ClientServerThread extends Thread{
 
     public String findKey(int key, List<String> visitedNodes){
         if(node.getKey() == key){
-            return key + " can be found at " + node.getIp()+":"+node.getPort();
+            return node.getIp()+":"+node.getPort();
         }
         visitedNodes.add(node.getIp()+":"+node.getPort());
         for(String address:node.getConnectedNodes()){
@@ -153,14 +148,14 @@ public class ClientServerThread extends Thread{
                     printWriter.println("find-key " + key + " " + visitedNodes.toString().replace(" ", ""));
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String res= bufferedReader.readLine();
-                    if(!res.contains("Error")) return res;
+                    if(!res.equals("ERROR")) return res;
 
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
-        return "Error, there is not any node containing key " + key;
+        return "ERROR";
     }
     public String getMax(List<String> visitedNodes){
         String max = node.getKey() + ":"+node.getValue();
@@ -214,7 +209,7 @@ public class ClientServerThread extends Thread{
                 throw new RuntimeException(e);
             }
         }
-        return "OK, " + key+":"+value;
+        return "OK";
     }
     public void terminate(){
         for(int i = 0; i < node.getConnectedNodes().size(); ++i){
