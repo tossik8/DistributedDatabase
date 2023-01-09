@@ -200,10 +200,12 @@ public class ClientServerThread extends Thread{
     public String newPair(int key, int value){
         node.setKey(key);
         node.setValue(value);
+        List<String> visitedNodes = new LinkedList<>(node.getConnectedNodes());
+        visitedNodes.add(node.getKey() + ":" + node.getValue());
         for(String address : node.getConnectedNodes()){
             try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                printWriter.println("set-value " + key + " " + value + " " + node.getConnectedNodes().toString().replace(" ", ""));
+                printWriter.println("set-value " + key + " " + value + " " + visitedNodes.toString().replace(" ", ""));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -7,7 +7,7 @@ public class Node {
     private final String ip;
     private int key;
     private int value;
-    private List<String> connectedNodes;
+    private final List<String> connectedNodes;
     private ServerSocket serverSocket;
     public Node(int port, String ip, int key, int value, List<String> connectedNodes) {
         setPort(port);
