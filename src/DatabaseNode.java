@@ -53,6 +53,7 @@ public class DatabaseNode {
                 try (Socket socket = new Socket(node.getIp(), node.getPort())) {
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     printWriter.println("new-record " + node.getKey() +" " +  node.getValue());
+                    printWriter.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
