@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
@@ -9,12 +10,14 @@ public class Node {
     private int value;
     private final List<String> connectedNodes;
     private ServerSocket serverSocket;
+    private final List<Thread> runningProcesses;
     public Node(int port, String ip, int key, int value, List<String> connectedNodes) {
         setPort(port);
         this.ip = ip;
         this.key = key;
         this.value = value;
         this.connectedNodes = connectedNodes;
+        runningProcesses = new ArrayList<>();
     }
     public void setValue(int value) {
         this.value = value;
@@ -51,7 +54,10 @@ public class Node {
     public List<String> getConnectedNodes() {
         return connectedNodes;
     }
-    public boolean connectNode(String ip,int port){
+    public List<Thread> getRunningProcesses() {
+        return runningProcesses;
+    }
+    public boolean connectNode(String ip, int port){
         try(Socket socket = new Socket(ip, port)) {
             PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
             pw.println("connect-node " + this.ip+":"+this.port);
@@ -69,7 +75,9 @@ public class Node {
         while(!serverSocket.isClosed()){
             try {
                 Socket request = serverSocket.accept();
-                (new ClientServerThread(request, this)).start();
+                Thread thread = new ClientServerThread(request, this);
+                runningProcesses.add(thread);
+                thread.start();
             }
             catch (IOException e) {
                 System.out.println(this.ip + ":" + this.port + " is closed");

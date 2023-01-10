@@ -1,8 +1,8 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DatabaseNode {
     public static void main(String[] args) {
@@ -21,7 +21,7 @@ public class DatabaseNode {
                 System.err.println("Arguments for -record were not provided in a proper format");
                 return;
             }
-            List<String> addresses = new LinkedList<>();
+            List<String> addresses = new CopyOnWriteArrayList<>();
             Node node = new Node(port, "192.168.0.94", key, value, addresses);
             for(int i = 5; i < args.length; i+=2){
                 if(args[i-1].equals("-connect")){

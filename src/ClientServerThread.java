@@ -30,42 +30,53 @@ public class ClientServerThread extends Thread{
                 visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
             }
             pw.println(this.getValue(Integer.parseInt(arguments[1]), visitedNodes));
+            node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("set-value")){
             if(arguments.length > 3){
                 visitedNodes.addAll(Arrays.asList(arguments[3].substring(1, arguments[3].length()-1).split(",")));
             }
             pw.println(this.setValue(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]), visitedNodes));
+            node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("find-key")){
             if(arguments.length > 2){
                 visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
             }
             pw.println(this.findKey(Integer.parseInt(arguments[1]), visitedNodes));
+            node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("get-max")){
             if(arguments.length > 1){
                 visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
             }
             pw.println(this.getMax(visitedNodes));
+            node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("get-min")){
             if(arguments.length > 1){
                 visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
             }
             pw.println(this.getMin(visitedNodes));
+            node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("new-record")){
             pw.println(this.newPair(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]), visitedNodes));
+            node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("terminate")){
+            node.getServerSocket().close();
+            node.getRunningProcesses().remove(this);
+            while(!node.getRunningProcesses().isEmpty()){
+                System.out.print("");
+            }
             this.terminate();
             pw.println("OK");
-            node.getServerSocket().close();
         }
         else if (operation.equals("connect-node")) {
             node.getConnectedNodes().add(arguments[1]);
             this.printConnectedNodes();
+            node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("disconnect-node")){
             node.getConnectedNodes().remove(arguments[1]);
@@ -79,6 +90,7 @@ public class ClientServerThread extends Thread{
         }
         else {
             pw.println("There is no operation " + firstLine);
+            node.getRunningProcesses().remove(this);
         }
     }
 
@@ -103,8 +115,12 @@ public class ClientServerThread extends Thread{
                     printWriter.println("get-value " + key + " " + visitedNodes.toString().replace(" ", ""));
                     String result = reader.readLine();
                     if(!result.equals("ERROR")) return result;
-
-                } catch (IOException e) {
+                    reader.close();
+                    printWriter.close();
+                } catch (ConnectException e){
+                    System.err.println("No connection with " + address);
+                }
+                catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -126,7 +142,12 @@ public class ClientServerThread extends Thread{
                     printWriter.println("set-value " + key + " " + value + " " + visitedNodes.toString().replace(" ", ""));
                     String result = reader.readLine();
                     if(!result.equals("ERROR")) res = result;
-                } catch (IOException e) {
+                    reader.close();
+                    printWriter.close();
+                } catch (ConnectException e){
+                    System.err.println("No connection with " + address);
+                }
+                catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -147,8 +168,12 @@ public class ClientServerThread extends Thread{
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String res= bufferedReader.readLine();
                     if(!res.equals("ERROR")) return res;
-
-                } catch (IOException e) {
+                    bufferedReader.close();
+                    printWriter.close();
+                } catch (ConnectException e){
+                    System.err.println("No connection with " + address);
+                }
+                catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -168,7 +193,12 @@ public class ClientServerThread extends Thread{
                     if(node.getValue() < Integer.parseInt(max2.split(":")[1])){
                         max = max2;
                     }
-                } catch (IOException e) {
+                    bufferedReader.close();
+                    printWriter.close();
+                } catch (ConnectException e){
+                    System.err.println("No connection with " + address);
+                }
+                catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -189,7 +219,12 @@ public class ClientServerThread extends Thread{
                     if(node.getValue() > Integer.parseInt(min2.split(":")[1])){
                         min = min2;
                     }
-                } catch (IOException e) {
+                    bufferedReader.close();
+                    printWriter.close();
+                } catch (ConnectException e){
+                    System.err.println("No connection with " + address);
+                }
+                catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -206,9 +241,12 @@ public class ClientServerThread extends Thread{
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                 visitedNodes.remove(address);
                 printWriter.println("set-value " + key + " " + value + " " + visitedNodes.toString().replace(" ", ""));
-                printWriter.close();
                 visitedNodes.add(address);
-            } catch (IOException e) {
+                printWriter.close();
+            } catch (ConnectException e){
+                System.err.println("No connection with " + address);
+            }
+            catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -227,7 +265,7 @@ public class ClientServerThread extends Thread{
             pw.println("disconnect-node " + node.getIp()+":"+node.getPort() + " " +addresses.toString().replace(" ", ""));
             pw.close();
         }catch (ConnectException e){
-            System.err.println("Failed to connect to " + nodeAddress.split(" ")[0] + ":" + nodeAddress.split(" ")[1]);
+            System.err.println("Failed to connect to " + nodeAddress);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

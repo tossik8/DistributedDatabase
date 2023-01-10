@@ -89,9 +89,8 @@ An example with "get-value" command:
     - If so, check if a neighbour has been visited.
       - If so, skip.
       - Else, go back to 1, and ,additionally, pass the list of visited nodes.
-        - Wait for the response.
-          - If response is <i>ERROR</i>, go back to 3.
-          - Else, send the result back to the client that contacted this node and finish execution.
+        - If response is <i>ERROR</i>, go back to 3.
+        - Else, send the result back to the client that contacted this node and finish execution.
     - Else, finish iterating
 4. Send <i>ERROR</i> to the client that contacted this node and finish execution
 
