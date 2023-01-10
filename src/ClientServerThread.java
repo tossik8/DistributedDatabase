@@ -33,10 +33,10 @@ public class ClientServerThread extends Thread{
             node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("set-value")){
-            if(arguments.length > 3){
-                visitedNodes.addAll(Arrays.asList(arguments[3].substring(1, arguments[3].length()-1).split(",")));
+            if(arguments.length > 2){
+                visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
             }
-            pw.println(this.setValue(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]), visitedNodes));
+            pw.println(this.setValue(Integer.parseInt(arguments[1].split(":")[0]), Integer.parseInt(arguments[1].split(":")[1]), visitedNodes));
             node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("find-key")){
@@ -61,7 +61,7 @@ public class ClientServerThread extends Thread{
             node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("new-record")){
-            pw.println(this.newPair(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]), visitedNodes));
+            pw.println(this.newPair(Integer.parseInt(arguments[1].split(":")[0]), Integer.parseInt(arguments[1].split(":")[1]), visitedNodes));
             node.getRunningProcesses().remove(this);
         }
         else if(operation.equals("terminate")){
@@ -139,7 +139,7 @@ public class ClientServerThread extends Thread{
                 try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))) {
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    printWriter.println("set-value " + key + " " + value + " " + visitedNodes.toString().replace(" ", ""));
+                    printWriter.println("set-value " + key + ":" + value + " " + visitedNodes.toString().replace(" ", ""));
                     String result = reader.readLine();
                     if(!result.equals("ERROR")) res = result;
                     reader.close();
@@ -240,7 +240,7 @@ public class ClientServerThread extends Thread{
             try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                 visitedNodes.remove(address);
-                printWriter.println("set-value " + key + " " + value + " " + visitedNodes.toString().replace(" ", ""));
+                printWriter.println("set-value " + key + ":" + value + " " + visitedNodes.toString().replace(" ", ""));
                 visitedNodes.add(address);
                 printWriter.close();
             } catch (ConnectException e){
