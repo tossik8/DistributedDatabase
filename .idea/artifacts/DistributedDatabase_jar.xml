@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DistributedDatabase:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/DistributedDatabase_jar</output-path>
+    <root id="archive" name="DistributedDatabase.jar">
+      <element id="module-output" name="DistributedDatabase" />
+    </root>
+  </artifact>
+</component>

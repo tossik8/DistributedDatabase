@@ -56,7 +56,7 @@ public class ClientServerThread extends Thread{
             pw.println(this.getMin(visitedNodes));
         }
         else if(operation.equals("new-record")){
-            pw.println(this.newPair(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2])));
+            pw.println(this.newPair(Integer.parseInt(arguments[1]), Integer.parseInt(arguments[2]), visitedNodes));
         }
         else if(operation.equals("terminate")){
             this.terminate();
@@ -126,7 +126,6 @@ public class ClientServerThread extends Thread{
                     printWriter.println("set-value " + key + " " + value + " " + visitedNodes.toString().replace(" ", ""));
                     String result = reader.readLine();
                     if(!result.equals("ERROR")) res = result;
-
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -197,15 +196,18 @@ public class ClientServerThread extends Thread{
         }
         return min;
     }
-    public String newPair(int key, int value){
+    public String newPair(int key, int value, List<String> visitedNodes){
         node.setKey(key);
         node.setValue(value);
-        List<String> visitedNodes = new LinkedList<>(node.getConnectedNodes());
-        visitedNodes.add(node.getKey() + ":" + node.getValue());
+        visitedNodes.addAll(node.getConnectedNodes());
+        visitedNodes.add(node.getIp() +":" + node.getPort());
         for(String address : node.getConnectedNodes()){
             try (Socket socket = new Socket(address.split(":")[0], Integer.parseInt(address.split(":")[1]))){
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                visitedNodes.remove(address);
                 printWriter.println("set-value " + key + " " + value + " " + visitedNodes.toString().replace(" ", ""));
+                printWriter.close();
+                visitedNodes.add(address);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
