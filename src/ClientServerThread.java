@@ -68,7 +68,7 @@ public class ClientServerThread extends Thread{
             node.getServerSocket().close();
             node.getRunningProcesses().remove(this);
             while(!node.getRunningProcesses().isEmpty()){
-                System.out.print("");
+                System.out.print(node.getRunningProcesses().toString());
             }
             this.terminate();
             pw.println("OK");

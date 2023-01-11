@@ -14,7 +14,7 @@ public class DatabaseNode {
             int port = Integer.parseInt(args[1]);
 
             List<String> addresses = new CopyOnWriteArrayList<>();
-            Node node = new Node(port, "192.168.0.94", 0, 0, addresses);
+            Node node = new Node(port, "localhost", 0, 0, addresses);
             int i = 3;
             for(; i < args.length; i+=2){
                 if(args[i-1].equals("-connect")){
