@@ -87,6 +87,7 @@ public class ClientServerThread extends Thread{
                     node.getConnectedNodes().add(neighbour);
             }
             this.printConnectedNodes();
+            node.getRunningProcesses().remove(this);
         }
         else {
             pw.println("There is no operation " + firstLine);
