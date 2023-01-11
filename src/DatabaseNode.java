@@ -12,7 +12,6 @@ public class DatabaseNode {
         }
         try{
             int port = Integer.parseInt(args[1]);
-
             List<String> addresses = new CopyOnWriteArrayList<>();
             Node node = new Node(port, "localhost", 0, 0, addresses);
             int i = 3;
