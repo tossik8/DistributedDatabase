@@ -190,10 +190,7 @@ public class ClientServerThread extends Thread{
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     printWriter.println("get-max " + visitedNodes.toString().replace(" ", ""));
                     BufferedReader bufferedReader =new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String max2 = bufferedReader.readLine();
-                    if(node.getValue() < Integer.parseInt(max2.split(":")[1])){
-                        max = max2;
-                    }
+                    max = compareValues(true, max, bufferedReader.readLine());
                     bufferedReader.close();
                     printWriter.close();
                 } catch (ConnectException e){
@@ -216,10 +213,7 @@ public class ClientServerThread extends Thread{
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     printWriter.println("get-min " + visitedNodes.toString().replace(" ", ""));
                     BufferedReader bufferedReader =new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String min2 = bufferedReader.readLine();
-                    if(node.getValue() > Integer.parseInt(min2.split(":")[1])){
-                        min = min2;
-                    }
+                    min = compareValues(false, min, bufferedReader.readLine());
                     bufferedReader.close();
                     printWriter.close();
                 } catch (ConnectException e){
@@ -231,6 +225,13 @@ public class ClientServerThread extends Thread{
             }
         }
         return min;
+    }
+
+    public String compareValues(boolean isMax, String value, String value2){
+        if(isMax){
+            return Integer.parseInt(value.split(":")[1]) > Integer.parseInt(value2.split(":")[1])? value:value2;
+        }
+        return Integer.parseInt(value2.split(":")[1]) < Integer.parseInt(value.split(":")[1])?value2:value;
     }
     public String newPair(int key, int value, List<String> visitedNodes){
         node.setKey(key);

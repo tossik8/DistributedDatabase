@@ -14,11 +14,11 @@ java DatabaseNode -tcpport 9005 -connect localhost:9004 -record 6:3 &
 sleep 1
 java DatabaseNode -tcpport 9006 -connect localhost:9005 -connect localhost:9000 -record 7:1 &
 sleep 1
-start java DatabaseNode -tcpport 9005 -connect localhost:9004 -record 11:0 &
+java DatabaseNode -tcpport 9005 -connect localhost:9004 -record 11:0 &
 sleep 1
 java DatabaseNode -tcppor 9005 -connect localhost:9004 -record 81:90 &
 sleep 1
-java DatabaseNode -tcpport 9005 -connec localhost:9004 -record 0:100 &
+java DatabaseNode -tcpport 9005 -connec localhost:9004 -connect localhost:9005 -record 0:100 &
 sleep 1
 java DatabaseNode -tcpport 9005 -connect localhost:9004 -recor 6:3 &
 sleep 1

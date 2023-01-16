@@ -16,7 +16,7 @@ start java DatabaseNode -tcpport 9005 -connect localhost:9004 -record 11:0
 timeout 1 > NUL
 java DatabaseNode -tcppor 9005 -connect localhost:9004 -record 81:90
 timeout 1 > NUL
-start java DatabaseNode -tcpport 9005 -connec localhost:9004 -connect localhost:9005 -record 0:100
+start java DatabaseNode -tcpport 9005 -connec localhost:9004 -connect localhost:9005 -record 0:3
 timeout 1 > NUL
 java DatabaseNode -tcpport 9005 -connect localhost:9004 -recor 6:3
 timeout 1 > NUL
