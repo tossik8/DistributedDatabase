@@ -36,12 +36,9 @@ public class DatabaseNode {
                 return;
             }
             String[] arr = args[i].split(":");
-            int key, value;
             try{
-                key = Integer.parseInt(arr[0]);
-                value = Integer.parseInt(arr[1]);
-                node.setKey(key);
-                node.setValue(value);
+                node.setKey(Integer.parseInt(arr[0]));
+                node.setValue(Integer.parseInt(arr[1]));
             }catch (ArrayIndexOutOfBoundsException e){
                 System.err.println("Arguments for -record were not provided in a proper format");
                 return;
