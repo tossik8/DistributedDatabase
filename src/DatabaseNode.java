@@ -13,7 +13,20 @@ public class DatabaseNode {
         try{
             int port = Integer.parseInt(args[1]);
             List<String> addresses = new CopyOnWriteArrayList<>();
-            Node node = new Node(port, "localhost", 0, 0, addresses);
+            if(!args[args.length-2].equals("-record")){
+                System.err.println("Wrong argument. Expected -record, received: " + args[args.length-2]);
+                return;
+            }
+            String[] arr = args[args.length - 1].split(":");
+            int key, value;
+            try{
+                key = Integer.parseInt(arr[0]);
+                value = Integer.parseInt(arr[1]);
+            }catch (ArrayIndexOutOfBoundsException e){
+                System.err.println("Arguments for -record were not provided in a proper format");
+                return;
+            }
+            Node node = new Node(port, "localhost", key, value, addresses);
             int i = 3;
             for(; i < args.length; i+=2){
                 if(args[i-1].equals("-connect")){
@@ -30,18 +43,6 @@ public class DatabaseNode {
                 else{
                     break;
                 }
-            }
-            if(!args[i-1].equals("-record")){
-                System.err.println("Wrong argument. Expected -record, received: " + args[i-1]);
-                return;
-            }
-            String[] arr = args[i].split(":");
-            try{
-                node.setKey(Integer.parseInt(arr[0]));
-                node.setValue(Integer.parseInt(arr[1]));
-            }catch (ArrayIndexOutOfBoundsException e){
-                System.err.println("Arguments for -record were not provided in a proper format");
-                return;
             }
             System.out.print("The new node listens on " + node.getIp() + ":" + node.getPort() + ", contains the value of " + node.getValue() + " under the key " + node.getKey()+"\nConnected to nodes: ");
             for(String neighbour:node.getConnectedNodes()){
