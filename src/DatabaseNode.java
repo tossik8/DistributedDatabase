@@ -28,7 +28,7 @@ public class DatabaseNode {
             }
             Node node = new Node(port, "localhost", key, value, addresses);
             int i = 3;
-            for(; i < args.length; i+=2){
+            for(; i < args.length - 1; i+=2){
                 if(args[i-1].equals("-connect")){
                     String[] address = args[i].split(":");
                     try {
@@ -39,9 +39,6 @@ public class DatabaseNode {
                     }catch (ArrayIndexOutOfBoundsException e){
                         System.err.println("Arguments for -connect were not provided in a proper format");
                     }
-                }
-                else{
-                    break;
                 }
             }
             System.out.print("The new node listens on " + node.getIp() + ":" + node.getPort() + ", contains the value of " + node.getValue() + " under the key " + node.getKey()+"\nConnected to nodes: ");
