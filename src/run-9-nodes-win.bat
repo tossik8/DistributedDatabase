@@ -24,6 +24,7 @@ timeout 1 > NUL
 
 java DatabaseClient -gateway localhost:9001 -operation new-record 20:-7
 java DatabaseClient -gateway localhost:9003 -operation get-value 20
+java DatabaseClient -gateway localhost:9007 -operation get-value 2
 java DatabaseClient -gateway localhost:9006 -operation set-value 5:-2
 java DatabaseClient -gateway localhost:9004 -operation get-value 5
 java DatabaseClient -gateway localhost:9000 -operation get-min
