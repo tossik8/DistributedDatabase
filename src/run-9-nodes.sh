@@ -18,7 +18,7 @@ java DatabaseNode -tcpport 9005 -connect localhost:9004 -record 11:0 &
 sleep 1
 java DatabaseNode -tcppor 9005 -connect localhost:9004 -record 81:90 &
 sleep 1
-java DatabaseNode -tcpport 9005 -connec localhost:9004 -connect localhost:9005 -record 0:100 &
+java DatabaseNode -tcpport 9005 -connec localhost:9004 -connect localhost:9005 -record 0:3 &
 sleep 1
 java DatabaseNode -tcpport 9005 -connect localhost:9004 -recor 6:3 &
 sleep 1
@@ -29,9 +29,12 @@ java DatabaseClient -gateway localhost:9006 -operation set-value 5:-2 &
 java DatabaseClient -gateway localhost:9004 -operation get-value 5 &
 java DatabaseClient -gateway localhost:9000 -operation get-min &
 java DatabaseClient -gateway localhost:9002 -operation find-key 78 &
-java DatabaseClient -gateway localhost:9001 -operation get-max &
+java DatabaseClient -gateway localhost:9008 -operation get-max &
 java DatabaseClient -gateway localhost:9000 -operation terminate &
-java DatabaseClient -gateway localhost:9001 -operation get-max &
+java DatabaseClient -gateway localhost:9008 -operation get-max &
+java DatabaseClient -gateway localhost:9008 -operation get-value 1 &
+java DatabaseClient -gateway localhost:9001 -operation terminate &
+java DatabaseClient -gateway localhost:9006 -operation get-min &
 sleep 5
 
 java DatabaseClient -gateway localhost:9000 -operation terminate

@@ -29,9 +29,12 @@ java DatabaseClient -gateway localhost:9004 -operation get-value 5
 java DatabaseClient -gateway localhost:9000 -operation get-min
 java DatabaseClient -gateway localhost:9002 -operation find-key 78
 java DatabaseClient -gateway localhost:9002 -operation find-key 0
-java DatabaseClient -gateway localhost:9001 -operation get-max
+java DatabaseClient -gateway localhost:9008 -operation get-max
 java DatabaseClient -gateway localhost:9000 -operation terminate
-java DatabaseClient -gateway localhost:9001 -operation get-max
+java DatabaseClient -gateway localhost:9008 -operation get-max
+java DatabaseClient -gateway localhost:9008 -operation get-value 1
+java DatabaseClient -gateway localhost:9001 -operation terminate
+java DatabaseClient -gateway localhost:9006 -operation get-min
 timeout 5 > NUL
 
 java DatabaseClient -gateway localhost:9000 -operation terminate
