@@ -62,11 +62,8 @@ public class Node {
             PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
             pw.println("connect-node " + this.ip+":"+this.port);
             pw.close();
-        }catch (ConnectException e){
+        }catch (IOException e){
             System.err.println("Failed to connect to " + ip + ":" + port);
-            return false;
-        }
-        catch (IOException e) {
             return false;
         }
         return true;

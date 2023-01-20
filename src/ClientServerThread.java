@@ -80,7 +80,7 @@ public class ClientServerThread extends Thread{
         }
         else if(operation.equals("disconnect-node")){
             node.getConnectedNodes().remove(arguments[1]);
-            System.out.println(arguments[1] + " is no longer connected to " + node.getIp() + " " + node.getPort());
+            System.out.println(arguments[1] + " is no longer connected to " + node.getIp() + ":" + node.getPort());
             List<String> neighbours = new LinkedList<>(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
             for(String neighbour : neighbours){
                 if(!node.getConnectedNodes().contains(neighbour) && !(node.getIp()+":"+node.getPort()).equals(neighbour))
@@ -96,7 +96,7 @@ public class ClientServerThread extends Thread{
     }
 
     public void printConnectedNodes(){
-        System.out.print(node.getIp() + " " + node.getPort() + " is connected to: ");
+        System.out.print(node.getIp() + ":" + node.getPort() + " is connected to: ");
         for (String s : node.getConnectedNodes()) {
             System.out.print(s + " ");
         }
