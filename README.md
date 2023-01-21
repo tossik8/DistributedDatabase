@@ -27,10 +27,8 @@ the basics of Java API.
 ## How to Run
 
 ### Node Execution
-- General format: `java DatabaseNode -tcpport <TCP port number> -record <key>:<value>
-  [ -connect <adrress>:<port> ]`
-- Concrete example: `java DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990
-  -connect localhost:9997 -connect localhost:9989`
+- General format: `java DatabaseNode -tcpport <TCP port number> [ -connect <adrress>:<port> ] -record <key>:<value>`
+- Concrete example: `java DatabaseNode -tcpport 9991 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989 -record 17:256`
 
 ### Client Execution
 - General format: `java DatabaseClient -gateway <address>:<TCP port number>
@@ -55,6 +53,7 @@ Communication with both clients and nodes is executed using the TCP protocol.
 Before execution, each node is provided with a port number. During the creation of a node, a setPort function
 is invoked, and unless the port number is available, it will increase the port number by 1 and check again
 until a free a port is found. As a consequence, the node might run on a port different from the provided one.
+In addition, port numbers cannot be negative or 0, so the node will not be started if either condition is met.
 
 
 ### Available operations
@@ -88,7 +87,7 @@ An example with "get-value" command:
 3. Check if there is a connected node
     - If so, check if a neighbour has been visited.
       - If so, skip.
-      - Else, go back to 1, and ,additionally, pass the list of visited nodes.
+      - Else, go back to 1, and, additionally, pass the list of visited nodes.
         - If response is <i>ERROR</i>, go back to 3.
         - Else, send the result back to the client that contacted this node and finish execution.
     - Else, finish iterating
