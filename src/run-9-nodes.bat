@@ -20,6 +20,8 @@ start java DatabaseNode -tcpport 9005 -connec localhost:9004 -connect localhost:
 timeout 1 > NUL
 java DatabaseNode -tcpport 9005 -connect localhost:9004 -recor 6:3
 timeout 1 > NUL
+java DatabaseNode -tcpport 0 -record 99:43
+timeout 1 > NUL
 
 
 java DatabaseClient -gateway localhost:9001 -operation new-record 20:-7
