@@ -58,15 +58,20 @@ public class Node {
         return runningProcesses;
     }
     public boolean connectNode(String ip, int port){
-        try(Socket socket = new Socket(ip, port)) {
-            PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
-            pw.println("connect-node " + this.ip+":"+this.port);
-            pw.close();
-        }catch (IOException e){
-            System.err.println("Failed to connect to " + ip + ":" + port);
-            return false;
+        if(port > 0){
+            try(Socket socket = new Socket(ip, port)) {
+                PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
+                pw.println("connect-node " + this.ip+":"+this.port);
+                pw.close();
+            }
+            catch (IOException e){
+                System.err.println("Failed to connect to " + ip + ":" + port);
+                return false;
+            }
+            return true;
         }
-        return true;
+        System.err.println("Cannot connect to a negative port");
+        return false;
     }
     public void listen() {
         while(!serverSocket.isClosed()){

@@ -13,6 +13,10 @@ public class DatabaseNode {
         }
         try{
             int port = Integer.parseInt(args[1]);
+            if(port <= 0){
+                System.err.println("Port numbers must be positive natural numbers. Instead received " + port);
+                return;
+            }
             List<String> addresses = new CopyOnWriteArrayList<>();
             if(!args[args.length-2].equals("-record")){
                 System.err.println("Wrong argument. Expected -record, received: " + args[args.length-2]);
@@ -32,7 +36,7 @@ public class DatabaseNode {
             for(; i < args.length - 1; i+=2){
                 if(args[i-1].equals("-connect")){
                     String[] address = args[i].split(":");
-                    if(address[0].equals("localhost")){
+                    if(address[0].equals("localhost") || address[0].equals("127.0.0.1")){
                         address[0] = obtainIP();
                     }
                     try {
