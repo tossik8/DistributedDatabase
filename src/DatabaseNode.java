@@ -56,21 +56,13 @@ public class DatabaseNode {
                 System.out.print(neighbour + " ");
             }
             System.out.println();
-            Thread thread = new Thread(() -> {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                try (Socket socket = new Socket(node.getIp(), node.getPort())) {
-                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                    printWriter.println("new-record " + node.getKey() + ":" + node.getValue() + " [" + node.getIp() + ":" + node.getPort() + "]");
-                    printWriter.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            thread.start();
+            try (Socket socket = new Socket(node.getIp(), node.getPort())) {
+                PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                printWriter.println("new-record " + node.getKey() + ":" + node.getValue() + " [" + node.getIp() + ":" + node.getPort() + "]");
+                printWriter.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             node.listen();
         } catch (NumberFormatException e){
             System.err.println("Couldn't create a DatabaseNode. Make sure values are passed properly and in the correct order\njava DatabaseNode -tcpport 9991 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989 -record 17:256");
