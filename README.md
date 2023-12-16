@@ -51,10 +51,6 @@ Before execution, each node is provided with a port number. During the creation 
 is invoked, and unless the port number is available, it will increase the port number by 1 and check again
 until a free a port is found. As a consequence, the node might run on a port different from the provided one.
 In addition, port numbers cannot be negative or 0, so the node will not be started if either condition is met.
-<<<<<<< HEAD
-=======
-
->>>>>>> ff2c2af309afc7305d22749930a9ad3180bed0a1
 
 ### Available operations
 
@@ -88,11 +84,7 @@ An example with "get-value" command:
     - If so, check if a neighbour has been visited.
       - If so, skip.
       - Else, go back to 1, and, additionally, pass the list of visited nodes.
-<<<<<<< HEAD
-        - If response is ERROR, go back to 3.
-=======
         - If response is <i>ERROR</i>, go back to 3.
->>>>>>> ff2c2af309afc7305d22749930a9ad3180bed0a1
         - Else, send the result back to the client that contacted this node and finish execution.
     - Else, finish iterating.
 4. Send ERROR to the client that contacted this node and finish execution.
