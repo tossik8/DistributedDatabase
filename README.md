@@ -2,16 +2,16 @@
 
 ## Table of Content
 
-- [Project Description](#project-description)
-- [How to Compile/Install](#how-to-compileinstall)
-- [How to Run](#how-to-run)
-  - [Node Execution](#node-execution)
-  - [Client Execution](#client-execution)
-- [How to Use](#how-to-use)
-- [Project Description](#project-description)
-  - [Available Operations](#available-operations)
-  - [Description of operations](#description-of-operations)
-- [Author](#author)
+- Project Description
+- How to Compile/Install
+- How to Run
+  - Node Execution
+  - Client Execution
+- How to Use
+- Project Description
+  - Available Operations
+  - Description of operations
+- Author
 
 ## Project Description
 The database allows you to store "key:value" pairs of data on each running node across many devices.
@@ -27,17 +27,12 @@ the basics of Java API.
 ## How to Run
 
 ### Node Execution
-- General format: `java DatabaseNode -tcpport <TCP port number> -record <key>:<value>
-  [ -connect <adrress>:<port> ]`
-- Concrete example: `java DatabaseNode -tcpport 9991 -record 17:256 -connect localhost:9990
-  -connect localhost:9997 -connect localhost:9989`
+- General format: `java DatabaseNode -tcpport <TCP port number> [ -connect <adrress>:<port> ] -record <key>:<value>`
+- Concrete example: `java DatabaseNode -tcpport 9991 -connect localhost:9990 -connect localhost:9997 -connect localhost:9989 -record 17:256`
 
 ### Client Execution
-- General format: `java DatabaseClient -gateway <address>:<TCP port number>
-  -operation <operation with parameters>`
+- General format: `java DatabaseClient -gateway <address>:<TCP port number> -operation <operation with parameters>`
 - Concrete example: `java DatabaseClient -gateway localhost:9991 -operation get-value 17`
-
-
 
 ## How to Use
 
@@ -55,24 +50,28 @@ Communication with both clients and nodes is executed using the TCP protocol.
 Before execution, each node is provided with a port number. During the creation of a node, a setPort function
 is invoked, and unless the port number is available, it will increase the port number by 1 and check again
 until a free a port is found. As a consequence, the node might run on a port different from the provided one.
+In addition, port numbers cannot be negative or 0, so the node will not be started if either condition is met.
+<<<<<<< HEAD
+=======
 
+>>>>>>> ff2c2af309afc7305d22749930a9ad3180bed0a1
 
 ### Available operations
 
 - `get-value <key>`
-  - If <i>key</i> is present, sends <i>key:value</i> to the client. Otherwise, <i>ERROR</i>.
+  - If key is present, sends key:value to the client. Otherwise, ERROR.
 - `set-value <key value>`
-  - If <i>key</i> is present, sets the new value, sends <i>key:value</i> to the client. Otherwise, <i>ERROR</i>.
+  - If key is present, sets the new value, sends key:value to the client. Otherwise, ERROR.
 - `find-key <key>`
-  - If <i>key</i> is present, sends <i>ip:port</i> of a node with this key to the client. Otherwise, <i>ERROR</i>.
+  - If key is present, sends ip:port of a node with this key to the client. Otherwise, ERROR.
 - `get-max`
-  - Sends the greatest value to the client in the following way: <i>key:value</i>.
+  - Sends the greatest value to the client in the following way: key:value.
 - `get-min`
-  - Sends the smallest value to the client in the following way: <i>key:value</i>.
+  - Sends the smallest value to the client in the following way: key:value.
 - `new-record <key value>`
-  - Updates the key-value pair of a node. Nodes with the same key are updated as well. Sends <i>OK</i> to the client.
+  - Updates the key-value pair of a node. Nodes with the same key are updated as well. Sends OK to the client.
 - `terminate`
-  - Terminates a node. Neighbours forget that node. Sends <i>OK</i> to the client.
+  - Terminates a node. Neighbours forget that node. Sends OK to the client.
 
 
 ### Description of operations
@@ -85,17 +84,23 @@ An example with "get-value" command:
 2. The node checks if it contains the key which is being looked for. 
     - If so, send the result  to the client and finish execution.
     - Else, add the address to the list of visited addresses and start iterating over the neighbours.
-3. Check if there is a connected node
+3. Check if there is a connected node.
     - If so, check if a neighbour has been visited.
       - If so, skip.
-      - Else, go back to 1, and ,additionally, pass the list of visited nodes.
+      - Else, go back to 1, and, additionally, pass the list of visited nodes.
+<<<<<<< HEAD
+        - If response is ERROR, go back to 3.
+=======
         - If response is <i>ERROR</i>, go back to 3.
+>>>>>>> ff2c2af309afc7305d22749930a9ad3180bed0a1
         - Else, send the result back to the client that contacted this node and finish execution.
-    - Else, finish iterating
-4. Send <i>ERROR</i> to the client that contacted this node and finish execution
+    - Else, finish iterating.
+4. Send ERROR to the client that contacted this node and finish execution.
+
+For examples with different commands, refer to the PDF file.
 
 Operation "new-record" sets a new value associated with the provided key to the node,
-and executes "set-value" operation to update the value in the entire network for the new <i>key</i> with the <i>value</i>
+and executes "set-value" operation to update the value in the entire network for the new key with the value
 provided as arguments to the "new-record" function.
 
 Operation "terminate" contacts all neighbours of a node being terminated and removes its address
@@ -103,4 +108,4 @@ from their lists of connected nodes.
 
 ## Author
 
-[Mykyta Toropov](https://www.facebook.com/nikita.toropov.54)
+Mykyta Toropov

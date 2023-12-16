@@ -25,73 +25,75 @@ public class ClientServerThread extends Thread{
         }
     }
     public void executeOperation(PrintWriter pw, String firstLine, String[] arguments, String operation, List<String> visitedNodes) throws IOException {
-        if(operation.equals("get-value")){
-            if(arguments.length > 2){
-                visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
-            }
-            pw.println(this.getValue(Integer.parseInt(arguments[1]), visitedNodes));
-            node.getRunningProcesses().remove(this);
-        }
-        else if(operation.equals("set-value")){
-            if(arguments.length > 2){
-                visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
-            }
-            pw.println(this.setValue(Integer.parseInt(arguments[1].split(":")[0]), Integer.parseInt(arguments[1].split(":")[1]), visitedNodes));
-            node.getRunningProcesses().remove(this);
-        }
-        else if(operation.equals("find-key")){
-            if(arguments.length > 2){
-                visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
-            }
-            pw.println(this.findKey(Integer.parseInt(arguments[1]), visitedNodes));
-            node.getRunningProcesses().remove(this);
-        }
-        else if(operation.equals("get-max")){
-            if(arguments.length > 1){
-                visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
-            }
-            pw.println(this.getMax(visitedNodes));
-            node.getRunningProcesses().remove(this);
-        }
-        else if(operation.equals("get-min")){
-            if(arguments.length > 1){
-                visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length()-1).split(",")));
-            }
-            pw.println(this.getMin(visitedNodes));
-            node.getRunningProcesses().remove(this);
-        }
-        else if(operation.equals("new-record")){
-            pw.println(this.newPair(Integer.parseInt(arguments[1].split(":")[0]), Integer.parseInt(arguments[1].split(":")[1]), visitedNodes));
-            node.getRunningProcesses().remove(this);
-        }
-        else if(operation.equals("terminate")){
-            node.getServerSocket().close();
-            node.getRunningProcesses().remove(this);
-            while(!node.getRunningProcesses().isEmpty()){
-                System.out.print("");
-            }
-            this.terminate();
-            pw.println("OK");
-        }
-        else if (operation.equals("connect-node")) {
-            node.getConnectedNodes().add(arguments[1]);
-            this.printConnectedNodes();
-            node.getRunningProcesses().remove(this);
-        }
-        else if(operation.equals("disconnect-node")){
-            node.getConnectedNodes().remove(arguments[1]);
-            System.out.println(arguments[1] + " is no longer connected to " + node.getIp() + ":" + node.getPort());
-            List<String> neighbours = new LinkedList<>(Arrays.asList(arguments[2].substring(1, arguments[2].length()-1).split(",")));
-            for(String neighbour : neighbours){
-                if(!node.getConnectedNodes().contains(neighbour) && !(node.getIp()+":"+node.getPort()).equals(neighbour))
-                    node.getConnectedNodes().add(neighbour);
-            }
-            this.printConnectedNodes();
-            node.getRunningProcesses().remove(this);
-        }
-        else {
-            pw.println("There is no operation " + firstLine);
-            node.getRunningProcesses().remove(this);
+        switch (operation) {
+            case "get-value":
+                if (arguments.length > 2) {
+                    visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length() - 1).split(",")));
+                }
+                pw.println(this.getValue(Integer.parseInt(arguments[1]), visitedNodes));
+                node.getRunningProcesses().remove(this);
+                break;
+            case "set-value":
+                if (arguments.length > 2) {
+                    visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length() - 1).split(",")));
+                }
+                pw.println(this.setValue(Integer.parseInt(arguments[1].split(":")[0]), Integer.parseInt(arguments[1].split(":")[1]), visitedNodes));
+                node.getRunningProcesses().remove(this);
+                break;
+            case "find-key":
+                if (arguments.length > 2) {
+                    visitedNodes.addAll(Arrays.asList(arguments[2].substring(1, arguments[2].length() - 1).split(",")));
+                }
+                pw.println(this.findKey(Integer.parseInt(arguments[1]), visitedNodes));
+                node.getRunningProcesses().remove(this);
+                break;
+            case "get-max":
+                if (arguments.length > 1) {
+                    visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length() - 1).split(",")));
+                }
+                pw.println(this.getMax(visitedNodes));
+                node.getRunningProcesses().remove(this);
+                break;
+            case "get-min":
+                if (arguments.length > 1) {
+                    visitedNodes.addAll(Arrays.asList(arguments[1].substring(1, arguments[1].length() - 1).split(",")));
+                }
+                pw.println(this.getMin(visitedNodes));
+                node.getRunningProcesses().remove(this);
+                break;
+            case "new-record":
+                pw.println(this.newPair(Integer.parseInt(arguments[1].split(":")[0]), Integer.parseInt(arguments[1].split(":")[1]), visitedNodes));
+                node.getRunningProcesses().remove(this);
+                break;
+            case "terminate":
+                node.getServerSocket().close();
+                node.getRunningProcesses().remove(this);
+                while (!node.getRunningProcesses().isEmpty()) {
+                    System.out.print("");
+                }
+                this.terminate();
+                pw.println("OK");
+                break;
+            case "connect-node":
+                node.getConnectedNodes().add(arguments[1]);
+                this.printConnectedNodes();
+                node.getRunningProcesses().remove(this);
+                break;
+            case "disconnect-node":
+                node.getConnectedNodes().remove(arguments[1]);
+                System.out.println(arguments[1] + " is no longer connected to " + node.getIp() + ":" + node.getPort());
+                List<String> neighbours = new LinkedList<>(Arrays.asList(arguments[2].substring(1, arguments[2].length() - 1).split(",")));
+                for (String neighbour : neighbours) {
+                    if (!node.getConnectedNodes().contains(neighbour) && !(node.getIp() + ":" + node.getPort()).equals(neighbour))
+                        node.getConnectedNodes().add(neighbour);
+                }
+                this.printConnectedNodes();
+                node.getRunningProcesses().remove(this);
+                break;
+            default:
+                pw.println("There is no operation " + firstLine);
+                node.getRunningProcesses().remove(this);
+                break;
         }
     }
 
